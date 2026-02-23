@@ -27,38 +27,62 @@ const LoginPage = () => {
     // --- OGGETTI DI STILE (Simil-Styled Components) ---
     const styles = {
         container: {
-            minHeight: '100vh',
-            background: 'radial-gradient(circle at center, #244a5a 0%, #0f2027 100%)',
-            color: 'white',
-            // Font Inter è quello che più si avvicina alla tua immagine
-            fontFamily: '"Inter", sans-serif',
-            padding: '40px 20px',
+            height: 'auto',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            boxSizing: 'border-box'
+            justifyContent: 'center',
+            backgroundColor: '#1a3c4a',
+            fontFamily: 'sans-serif',
+            margin: 0
         },
-        mainAmount: {
-            fontSize: '3.8rem',
-            fontWeight: '700',
-            color: '#5eead4', // Il verde acqua neon dell'immagine
-            textShadow: '0 0 25px rgba(94, 234, 212, 0.3)',
-            margin: '15px 0',
-            letterSpacing: '-0.05em' // Tracking negativo per look premium
+        card: {
+            width: '100%',
+            maxWidth: '400px',
+            padding: '2rem',
+            textAlign: 'center',
         },
-        statValueEntrate: {
-            fontSize: '1.45rem',
-            fontWeight: '600',
-            color: '#32e0a1', // Verde smeraldo brillante
-            letterSpacing: '-0.02em'
+        title: {
+            color: 'white',
+            fontSize: '2.5rem',
+            fontWeight: 'bold',
+            marginBottom: '3rem',
         },
-        statValueUscite: {
-            fontSize: '1.45rem',
-            fontWeight: '600',
-            color: '#4fd1c5', // Teal/Petrolio chiaro opaco
-            letterSpacing: '-0.02em'
+        inputGroup: {
+            marginBottom: '1.5rem',
+        },
+        input: {
+            width: '100%',
+            padding: '1rem 1.5rem',
+            backgroundColor: 'transparent',
+            border: '2px solid rgba(94, 234, 212, 0.3)',
+            borderRadius: '50px',
+            color: 'white',
+            fontSize: '1rem',
+            outline: 'none',
+            boxSizing: 'border-box',
+            transition: 'all 0.3s ease',
+        },
+        button: {
+            width: '100%',
+            padding: '1rem',
+            marginTop: '2rem',
+            backgroundColor: '#82e9b8',
+            border: 'none',
+            borderRadius: '50px',
+            color: '#1a3c4a',
+            fontSize: '1.2rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            transition: '0.3s',
+        },
+        link: {
+            color: 'white',
+            marginTop: '1.5rem',
+            fontSize: '0.9rem',
+            opacity: 0.8,
+            cursor: 'pointer',
+            display: 'block'
         }
-        // ... mantieni gli altri stili invariati
     };
 
     return (
@@ -117,7 +141,6 @@ const LoginPage = () => {
 
                 <span style={styles.link}>Password dimenticata?</span>
             </div>
-
         </div>
     );
 };
