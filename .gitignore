@@ -1,0 +1,11 @@
+# Dipendenze
+node_modules/
+server/node_modules/
+client/node_modules/
+
+# Variabili d'ambiente
+.env
+server/.env
+
+# File di sistema
+.DS_Store
