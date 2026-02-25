@@ -1,74 +1,119 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Wallet, ArrowDown, ArrowUp, Home, List, Activity, User, Calendar } from 'lucide-react';
+import BottomNav from "../components/BottomNav.jsx";
 import axios from "axios";
 
 const DashboardPage = () => {
     const [balance, setBalance] = useState({ entrate: 0, uscite: 0, totale: 0 });
+    const [transactions, setTransactions] = useState([]);
+    const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
 
+    const fetchData = async () => {
+        try {
+            // Recupero Bilancio
+            const resBalance = await axios.get(`http://localhost:5000/api/transactions/balance/${userId}`);
+            setBalance(resBalance.data.data);
+
+            // Recupero Lista Transazioni (usando il tuo endpoint)
+            const resList = await axios.get(`http://localhost:5000/api/transactions/${userId}`);
+            console.log (resList);
+            // Prendiamo le ultime 4 per mantenere pulito il design
+            setTransactions(resList.data.data.slice(0, 4));
+        } catch (error) {
+            console.error("Errore nel recupero dati", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchBalance = async () => {
-            try {
-                const res = await axios.get(`http://localhost:5000/api/transactions/balance/${userId}`);
-                setBalance(res.data.data);
-            } catch (error) {
-                console.error("Errore nel recupero del bilancio", error);
-            }
-        };
-        if (userId) fetchBalance();
+        if (userId) {
+            fetchData();
+        }
     }, [userId]);
 
-    // Calcolo percentuale per la barra di progressione
     const totalCashFlow = balance.entrate + balance.uscite;
     const incomePercentage = totalCashFlow > 0 ? (balance.entrate / totalCashFlow) * 100 : 0;
 
     const styles = {
         container: {
             minHeight: '100vh',
-            background: 'linear-gradient(180deg, #dcfce7 0%, #ffffff 40%)', // Sfondo sfumato verde menta chiaro
+            background: 'linear-gradient(180deg, #dcfce7 0%, #ffffff 40%)',
             fontFamily: '"Nunito", sans-serif',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             boxSizing: 'border-box',
-            paddingTop: '20px'
+            paddingTop: '20px',
+            paddingBottom: '100px', // Spazio per la navigazione
+            position: 'relative',
+        },
+        headerBackground: {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '220px',
+            background: '#caf1dd',
+            borderBottomLeftRadius: '80px',
+            borderBottomRightRadius: '80px',
+            zIndex: 0
+        },
+        logoWrapper: {
+            zIndex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            marginBottom: '20px'
+        },
+        logoImage: {
+            width: '80px',
+            height: '80px',
+            borderRadius: '22px',
+            marginBottom: '10px',
+            filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))',
+            objectFit: 'cover'
         },
         headerTitle: {
-            fontSize: '1.4rem',
-            fontWeight: '600',
+            fontSize: '1.2rem',
+            fontWeight: '800',
             color: '#1e3a3a',
-            marginBottom: '30px',
+            margin: 0,
+            letterSpacing: '1px',
+            textTransform: 'uppercase'
         },
         card: {
             background: '#ffffff',
             borderRadius: '35px',
-            padding: '40px 20px',
+            padding: '25px 20px',
             width: '85%',
             maxWidth: '400px',
-            boxShadow: '#00000030 0px 20px 40px', // Ombra molto morbida
+            boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
             textAlign: 'center',
-            marginBottom: '40px',
-            zIndex: '1'
+            marginBottom: '35px',
+            zIndex: 1
         },
         saldoLabel: {
-            fontFamily: '"Montserrat", sans-serif',
             fontWeight: '600',
             fontSize: '1rem',
-            color: '#1e3a3a',
+            color: '#64748b',
+            margin: '0 0 5px 0'
         },
         mainAmount: {
             fontSize: '2.8rem',
-            fontWeight: '700', // Per farlo bello pieno come in foto
-            color: '#1e3a3a', // Grigio antracite molto scuro
+            fontWeight: '800',
+            color: '#1e3a3a',
             letterSpacing: '-0.02em',
         },
         btnContainer: {
             display: 'flex',
             gap: '20px',
-            marginBottom: '40px'
+            marginBottom: '35px',
+            zIndex: 1
         },
         actionBtn: (type) => ({
-            width: '130px',
-            height: '130px',
+            width: '135px',
+            height: '135px',
             borderRadius: '50%',
             border: 'none',
             display: 'flex',
@@ -76,145 +121,167 @@ const DashboardPage = () => {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            fontSize: '0.85rem',
-            fontWeight: '600',
-            transition: 'transform 0.2s',
-            background: type === 'in' ? '#bee6d3' : '#f79d92', // Verde chiaro e Rosso chiaro
+            background: type === 'in' ? '#d8f3dc' : '#f8d7da',
             color: '#1e3a3a',
-            boxShadow: '0 10px 20px rgba(0,0,0,0.03)'
+            boxShadow: '0 10px 20px rgba(0,0,0,0.05)',
+            transition: 'all 0.2s ease'
         }),
-        iconWrapper: {
-            width: '45px',
-            marginBottom: '10px'
-        },
         statsSection: {
             width: '85%',
             maxWidth: '400px',
             display: 'flex',
             justifyContent: 'space-between',
-            marginBottom: '10px',
-            padding: '0 10px'
-        },
-        statInfo: {
-            display: 'flex',
-            flexDirection: 'column',
+            marginBottom: '15px',
+            padding: '0 15px',
+            zIndex: 1
         },
         progressBarContainer: {
             width: '85%',
             maxWidth: '400px',
-            height: '52px',
+            height: '14px', // Più sottile per lasciare spazio alla lista
             background: '#f1f5f9',
             borderRadius: '32px',
             overflow: 'hidden',
-            marginBottom: '80px'
-        },
-        // IL DIV VERDE CHE CERCAVI:
-        headerBackground: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '257px', // Altezza della zona verde
-            background: '#caf1dd', // Verde menta chiarissimo dell'immagine
-            borderBottomLeftRadius: '80px', // Arrotondamento accentuato
-            borderBottomRightRadius: '80px',
-            zIndex: 0
+            marginBottom: '30px',
+            zIndex: 1,
         },
         progressBarFill: {
             height: '100%',
-            background: '#a7f3d0', // Colore della barra nell'immagine
+            background: '#4ade80',
             borderRadius: '32px',
-            transition: 'width 0.5s ease-out'
+            transition: 'width 0.8s ease'
         },
-        bottomNav: {
-            position: 'fixed',
-            bottom: 0,
-            width: '100%',
-            height: '70px',
-            background: '#ffffff',
+        historySection: {
+            width: '85%',
+            maxWidth: '400px',
             display: 'flex',
-            justifyContent: 'space-around',
+            flexDirection: 'column',
+            zIndex: 1,
+            flex: 1, // Prende lo spazio rimanente
+            minHeight: 0, // Necessario per far funzionare lo scroll interno in flexbox
+        },
+        scrollContainer: {
+            maxHeight: '200px', // Altezza fissa per lo scroll
+            overflowY: 'auto',
+            paddingRight: '5px', // Spazio per non coprire il contenuto con la scrollbar
+            scrollbarWidth: 'none', // Nasconde scrollbar su Firefox
+            msOverflowStyle: 'none', // Nasconde scrollbar su IE/Edge
+        },
+        historyHeader: {
+            display: 'flex',
+            justifyContent: 'space-between',
             alignItems: 'center',
-            borderTop: '1px solid #f1f5f9'
-        }
+            marginBottom: '15px'
+        },
+        transactionItem: {
+            background: '#ffffff',
+            borderRadius: '24px',
+            padding: '12px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '10px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+        },
+        iconCircle: (isIn) => ({
+            width: '40px',
+            height: '40px',
+            borderRadius: '12px',
+            background: isIn ? '#d8f3dc' : '#f8d7da',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: '12px'
+        }),
     };
 
     return (
-        <div style={ styles.container }>
-            <div style={ styles.headerBackground }></div>
-            <h1 style={ styles.headerTitle }>In&Out</h1>
-            <div style={ styles.card }>
-                <p style={ styles.saldoLabel }>Saldo Attuale</p>
-                <div style={ styles.mainAmount }>
-                    € { balance.totale.toLocaleString ( 'it-IT', {minimumFractionDigits: 2} ) }
+        <div style={styles.container}>
+            <div style={styles.headerBackground}></div>
+
+            <div style={styles.logoWrapper}>
+                <img src="/logo.png" alt="Logo" style={styles.logoImage} />
+            </div>
+
+            <div style={styles.card}>
+                <p style={styles.saldoLabel}>Saldo Attuale</p>
+                <div style={styles.mainAmount}>
+                    € {balance.totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                 </div>
             </div>
 
-            <div style={ styles.btnContainer }>
-                {/* Tasto Entrate */ }
-                <button style={ styles.actionBtn ( 'in' ) }>
-                    <div style={ styles.iconWrapper }>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#1e3a3a" strokeWidth="1.5">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                            <polyline points="17 21 17 13 7 13 7 21"/>
-                            <polyline points="7 3 7 8 15 8"/>
-                            <path d="M12 18v-5m0 0l-3 3m3-3l3 3"/>
-                        </svg>
-                    </div>
-                    + Entrate
+            <div style={styles.btnContainer}>
+                <button style={styles.actionBtn('in')} onClick={() => navigate('/transaction/IN')}>
+                    <Wallet size={32} />
+                    <span style={{fontWeight: 700, marginTop: '5px'}}>+ Entrate</span>
                 </button>
-
-                {/* Tasto Uscite */ }
-                <button style={ styles.actionBtn ( 'out' ) }>
-                    <div style={ styles.iconWrapper }>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#1e3a3a" strokeWidth="1.5">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                            <polyline points="17 21 17 13 7 13 7 21"/>
-                            <polyline points="7 3 7 8 15 8"/>
-                            <path d="M12 13v5m0 0l-3-3m3 3l3-3"/>
-                        </svg>
-                    </div>
-                    - Uscite
+                <button style={styles.actionBtn('out')} onClick={() => navigate('/transaction/OUT')}>
+                    <Wallet size={32} />
+                    <span style={{fontWeight: 700, marginTop: '5px'}}>- Uscite</span>
                 </button>
             </div>
 
-            <div style={ styles.statsSection }>
-                <div style={ styles.statInfo }>
-                    <span style={ {fontSize: '0.8rem', color: '#64748b'} }>Entrate</span>
-                    <span style={ {fontWeight: '700'} }>€ { balance.entrate.toLocaleString ( 'it-IT' ) }</span>
+            <div style={styles.statsSection}>
+                <div style={{display: 'flex', flexDirection: 'column'}}>
+                    <span style={{fontSize: '0.7rem', color: '#64748b', fontWeight: 800}}>ENTRATE</span>
+                    <span style={{fontWeight: 800, color: '#1e3a3a'}}>€ {balance.entrate.toLocaleString('it-IT')}</span>
                 </div>
-                <div style={ {...styles.statInfo, alignItems: 'flex-end'} }>
-                    <span style={ {fontSize: '0.8rem', color: '#64748b'} }>Uscite</span>
-                    <span style={ {fontWeight: '700'} }>€ { balance.uscite.toLocaleString ( 'it-IT' ) }</span>
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
+                    <span style={{fontSize: '0.7rem', color: '#64748b', fontWeight: 800}}>USCITE</span>
+                    <span style={{fontWeight: 800, color: '#1e3a3a'}}>€ {balance.uscite.toLocaleString('it-IT')}</span>
                 </div>
             </div>
 
-            {/* Barra di progressione dinamica */ }
-            <div style={ styles.progressBarContainer }>
-                <div style={ {...styles.progressBarFill, width: `${ incomePercentage }%`} }></div>
+            <div style={styles.progressBarContainer}>
+                <div style={{ ...styles.progressBarFill, width: `${incomePercentage}%` }}></div>
             </div>
 
-            {/* Bottom Nav Semplificata */ }
-            <nav style={ styles.bottomNav }>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                </svg>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
-                    <line x1="8" y1="6" x2="21" y2="6"/>
-                    <line x1="8" y1="12" x2="21" y2="12"/>
-                    <line x1="8" y1="18" x2="21" y2="18"/>
-                    <line x1="3" y1="6" x2="3.01" y2="6"/>
-                    <line x1="3" y1="12" x2="3.01" y2="12"/>
-                    <line x1="3" y1="18" x2="3.01" y2="18"/>
-                </svg>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-                </svg>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-            </nav>
+            <div style={ styles.historySection }>
+                <div style={ styles.historyHeader }>
+                    <span style={ {fontWeight: 800, color: '#1e3a3a'} }>Attività Recenti</span>
+                    <span style={ {fontSize: '0.8rem', color: '#4ade80', fontWeight: 700, cursor: 'pointer'} }>Vedi tutto</span>
+                </div>
+
+                <div style={ styles.scrollContainer } className="scroll-container">
+                    { transactions.length > 0 ? (
+                        transactions.map ( ( t ) => {
+                            const isIn = t.type === 'IN';
+                            return (
+                                <div key={ t._id } style={ styles.transactionItem }>
+                                    <div style={ styles.iconCircle ( isIn ) }>
+                                        { isIn ? <ArrowDown size={ 18 } color="#2d6a4f"/> :
+                                            <ArrowUp size={ 18 } color="#a4161a"/> }
+                                    </div>
+                                    <div style={ {flex: 1} }>
+                                        <div style={ {
+                                            fontWeight: 700,
+                                            color: '#1e3a3a',
+                                            fontSize: '0.9rem'
+                                        } }>{ t.category }</div>
+                                        <div style={ {
+                                            fontSize: '0.7rem',
+                                            color: '#94a3b8',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px'
+                                        } }>
+                                            <Calendar
+                                                size={ 10 }/> { new Date ( t.date ).toLocaleDateString ( 'it-IT' ) }
+                                        </div>
+                                    </div>
+                                    <div style={ {fontWeight: 800, color: isIn ? '#2d6a4f' : '#a4161a'} }>
+                                        { isIn ? '+' : '-' } €{ t.amount.toLocaleString ( 'it-IT', {minimumFractionDigits: 2} ) }
+                                    </div>
+                                </div>
+                            );
+                        } )
+                    ) : (
+                        <div style={ {textAlign: 'center', color: '#94a3b8', padding: '20px'} }>
+                            Nessun movimento trovato
+                        </div>
+                    ) }
+                </div>
+            </div>
+            <BottomNav />
         </div>
     );
 };

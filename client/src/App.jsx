@@ -2,6 +2,8 @@ import './App.css'
 import {Routes, Route, Navigate} from "react-router-dom";
 import LoginPage from './pages/Login.page.jsx';
 import DashboardPage from './pages/Dashboard.page.jsx';
+import TransacationPage from './pages/Transaction.page.jsx'
+import TransactionPage from "./pages/Transaction.page.jsx";
 
 function App() {
     return (
@@ -9,6 +11,7 @@ function App() {
             <Routes>
                 <Route path="/login" element={ <LoginPage/> }/>
                 <Route path="/dashboard" element={ <DashboardPage/> }/>
+                <Route path="/transaction/:type" element={ <TransactionPage/> }/>
                 <Route path="*" element={ <Navigate to="/login"/> }/>
             </Routes>
         </div>
