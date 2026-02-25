@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import LoginPage from './pages/Login.page.jsx';
 import DashboardPage from './pages/Dashboard.page.jsx';
 import TransacationPage from './pages/Transaction.page.jsx'
+import TransactionsList from './pages/Transactions.page.jsx'
 import ProfilePage from './pages/Profile.page.jsx'
 import RegisterPage from './pages/Register.page.jsx'
 import MainLayout from './layouts/MainLayout';
@@ -23,8 +24,12 @@ function App() {
                             </MainLayout>
                         </ProtectedRoute>
                     }/>
-                    <Route path="/transaction/:type" element={
-                        <ProtectedRoute> <TransacationPage/> </ProtectedRoute> }/>
+                    <Route path="/transaction/:type" element={ <ProtectedRoute> <TransacationPage/> </ProtectedRoute> }/>
+                    <Route path="/transactions" element={
+                        <ProtectedRoute>
+                            <TransactionsList />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/stats" element={ <MainLayout>
                         <div>Pagina Stats (Coming Soon)</div>
                     </MainLayout> }/>

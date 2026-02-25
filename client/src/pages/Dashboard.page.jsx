@@ -247,7 +247,9 @@ const DashboardPage = () => {
             <div style={ styles.historySection }>
                 <div style={ styles.historyHeader }>
                     <span style={ {fontWeight: 800, color: '#1e3a3a'} }>Attività Recenti</span>
-                    <span style={ {fontSize: '0.8rem', color: '#4ade80', fontWeight: 700, cursor: 'pointer'} }>Vedi tutto</span>
+                    <span
+                        onClick={() => navigate('/transactions')}
+                        style={ {fontSize: '0.8rem', color: '#4ade80', fontWeight: 700, cursor: 'pointer'} }>Vedi tutto</span>
                 </div>
 
                 <div style={ styles.scrollContainer } className="scroll-container">
