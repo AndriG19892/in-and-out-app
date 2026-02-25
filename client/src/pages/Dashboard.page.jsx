@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {useUser} from "../hooks/useUser.js";
 import { Wallet, ArrowDown, ArrowUp, Home, List, Activity, User, Calendar } from 'lucide-react';
 import BottomNav from "../components/BottomNav.jsx";
 import axios from "axios";
 
 const DashboardPage = () => {
+    const {user, logout} = useUser();
     const [balance, setBalance] = useState({ entrate: 0, uscite: 0, totale: 0 });
     const [transactions, setTransactions] = useState([]);
     const navigate = useNavigate();
-    const userId = localStorage.getItem("userId");
-
-    const fetchData = async () => {
-        try {
-            // Recupero Bilancio
-            const resBalance = await axios.get(`http://localhost:5000/api/transactions/balance/${userId}`);
-            setBalance(resBalance.data.data);
-
-            // Recupero Lista Transazioni (usando il tuo endpoint)
-            const resList = await axios.get(`http://localhost:5000/api/transactions/${userId}`);
-            console.log (resList);
-            // Prendiamo le ultime 4 per mantenere pulito il design
-            setTransactions(resList.data.data.slice(0, 4));
-        } catch (error) {
-            console.error("Errore nel recupero dati", error);
-        }
-    };
+    const userId = user?.id || user?._id;
 
     useEffect(() => {
-        if (userId) {
-            fetchData();
-        }
-    }, [userId]);
+        const fetchData = async () => {
+            if (!userId) return; // Se l'utente non è ancora caricato, non fare nulla
+
+            try {
+                const [resBalance, resList] = await Promise.all([
+                    axios.get(`http://localhost:5000/api/transactions/balance/${userId}`),
+                    axios.get(`http://localhost:5000/api/transactions/${userId}`)
+                ]);
+                setBalance(resBalance.data.data);
+                setTransactions(resList.data.data.slice(0, 4));
+            } catch (error) {
+                console.error("Errore recupero dati:", error);
+            }
+        };
+
+        fetchData();
+    }, [userId]); // Riesegui se l'ID utente cambia
 
     const totalCashFlow = balance.entrate + balance.uscite;
     const incomePercentage = totalCashFlow > 0 ? (balance.entrate / totalCashFlow) * 100 : 0;
@@ -195,44 +194,54 @@ const DashboardPage = () => {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.headerBackground}></div>
+        <div style={ styles.container }>
 
-            <div style={styles.logoWrapper}>
-                <img src="/logo.png" alt="Logo" style={styles.logoImage} />
+            <div style={ styles.headerBackground }></div>
+            <div style={ {zIndex: 1, width: '85%', maxWidth: '400px', marginBottom: '15px'} }>
+                <h2 style={ {margin: 0, fontSize: '1.5rem', color: '#1e3a3a'} }>
+                    Ciao, { user?.nome || 'Utente' }! 👋
+                </h2>
+                <p style={ {margin: 0, color: '#64748b', fontSize: '0.9rem'} }>
+                    Ecco il riepilogo delle tue finanze
+                </p>
             </div>
-
-            <div style={styles.card}>
-                <p style={styles.saldoLabel}>Saldo Attuale</p>
-                <div style={styles.mainAmount}>
-                    € {balance.totale.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+            <div style={ styles.card }>
+                <p style={ styles.saldoLabel }>Saldo Attuale</p>
+                <div style={ styles.mainAmount }>
+                    € { balance.totale.toLocaleString ( 'it-IT', {minimumFractionDigits: 2} ) }
                 </div>
             </div>
 
-            <div style={styles.btnContainer}>
-                <button style={styles.actionBtn('in')} onClick={() => navigate('/transaction/IN')}>
-                    <Wallet size={32} />
-                    <span style={{fontWeight: 700, marginTop: '5px'}}>+ Entrate</span>
+            <div style={ styles.btnContainer }>
+                <button style={ styles.actionBtn ( 'in' ) } onClick={ () => navigate ( '/transaction/IN' ) }>
+                    <Wallet size={ 32 }/>
+                    <span style={ {fontWeight: 700, marginTop: '5px'} }>+ Entrate</span>
                 </button>
-                <button style={styles.actionBtn('out')} onClick={() => navigate('/transaction/OUT')}>
-                    <Wallet size={32} />
-                    <span style={{fontWeight: 700, marginTop: '5px'}}>- Uscite</span>
+                <button style={ styles.actionBtn ( 'out' ) } onClick={ () => navigate ( '/transaction/OUT' ) }>
+                    <Wallet size={ 32 }/>
+                    <span style={ {fontWeight: 700, marginTop: '5px'} }>- Uscite</span>
                 </button>
             </div>
 
-            <div style={styles.statsSection}>
-                <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <span style={{fontSize: '0.7rem', color: '#64748b', fontWeight: 800}}>ENTRATE</span>
-                    <span style={{fontWeight: 800, color: '#1e3a3a'}}>€ {balance.entrate.toLocaleString('it-IT')}</span>
+            <div style={ styles.statsSection }>
+                <div style={ {display: 'flex', flexDirection: 'column'} }>
+                    <span style={ {fontSize: '0.7rem', color: '#64748b', fontWeight: 800} }>ENTRATE</span>
+                    <span style={ {
+                        fontWeight: 800,
+                        color: '#1e3a3a'
+                    } }>€ { balance.entrate.toLocaleString ( 'it-IT' ) }</span>
                 </div>
-                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end'}}>
-                    <span style={{fontSize: '0.7rem', color: '#64748b', fontWeight: 800}}>USCITE</span>
-                    <span style={{fontWeight: 800, color: '#1e3a3a'}}>€ {balance.uscite.toLocaleString('it-IT')}</span>
+                <div style={ {display: 'flex', flexDirection: 'column', alignItems: 'flex-end'} }>
+                    <span style={ {fontSize: '0.7rem', color: '#64748b', fontWeight: 800} }>USCITE</span>
+                    <span style={ {
+                        fontWeight: 800,
+                        color: '#1e3a3a'
+                    } }>€ { balance.uscite.toLocaleString ( 'it-IT' ) }</span>
                 </div>
             </div>
 
-            <div style={styles.progressBarContainer}>
-                <div style={{ ...styles.progressBarFill, width: `${incomePercentage}%` }}></div>
+            <div style={ styles.progressBarContainer }>
+                <div style={ {...styles.progressBarFill, width: `${ incomePercentage }%`} }></div>
             </div>
 
             <div style={ styles.historySection }>
@@ -281,7 +290,7 @@ const DashboardPage = () => {
                     ) }
                 </div>
             </div>
-            <BottomNav />
+            <BottomNav/>
         </div>
     );
 };
