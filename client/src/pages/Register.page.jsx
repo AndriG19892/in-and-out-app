@@ -1,29 +1,27 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import {useUser} from '../hooks/useUser.js';
-import {useLocation, useNavigate} from 'react-router-dom';
-import {Mail, Lock, ArrowRight, Wallet} from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // Per reindirizzare
+import { User, Mail, Lock, ArrowRight, Wallet } from 'lucide-react'; // Icone
 
-const LoginPage = () => {
-    const navigate = useNavigate ();
-    const location = useLocation ();
-    const [email, setEmail] = useState ( '' );
-    const [password, setPassword] = useState ( '' );
-    const {login} = useUser ();
+const RegisterPage = () => {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-    const handleLogin = async ( e ) => {
-        e.preventDefault ();
+    const handleRegister = async (e) => {
+        e.preventDefault();
         try {
-            const res = await axios.post ( 'http://localhost:5000/api/auth/login', {email, password} );
-            const userData = res.data.user;
+            // Assicurati che il tuo backend abbia un endpoint /api/auth/register
+            const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
 
-            if ( userData && userData.id ) {
-                login ( userData );
-                window.location.href = '/dashboard';
+            if (res.data.success) {
+                alert("Registrazione avvenuta con successo! Effettua il login.");
+                navigate('/login'); // Reindirizza al login dopo la registrazione
             }
         } catch (err) {
-            console.error ( "Errore login:", err );
-            alert ( "Credenziali errate" );
+            console.error("Errore registrazione:", err.response?.data || err.message);
+            alert(err.response?.data?.message || "Errore durante la registrazione.");
         }
     };
 
@@ -138,66 +136,77 @@ const LoginPage = () => {
     };
 
     return (
-        <div style={ styles.container }>
-            <div style={ styles.headerBackground }></div>
+        <div style={styles.container}>
+            <div style={styles.headerBackground}></div>
 
-            <div style={ styles.logoWrapper }>
-                <div style={ styles.logoIcon }>
-                    <Wallet size={ 40 }/>
+            <div style={styles.logoWrapper}>
+                <div style={styles.logoIcon}>
+                    <Wallet size={40} />
                 </div>
-                <h1 style={ styles.headerTitle }>In&Out</h1>
+                <h1 style={styles.headerTitle}>In&Out</h1>
             </div>
 
-            <div style={ styles.card }>
-                <h2 style={ {margin: '0 0 10px 0', color: '#1e3a3a', fontWeight: 800} }>Bentornato</h2>
-                <p style={ {margin: '0 0 30px 0', color: '#64748b', fontSize: '0.9rem'} }>Accedi per gestire il tuo
-                    portafoglio</p>
+            <div style={styles.card}>
+                <h2 style={{margin: '0 0 10px 0', color: '#1e3a3a', fontWeight: 800}}>Crea un account</h2>
+                <p style={{margin: '0 0 30px 0', color: '#64748b', fontSize: '0.9rem'}}>Inizia a gestire le tue finanze oggi stesso</p>
 
-                <form onSubmit={ handleLogin }>
-                    <div style={ styles.inputWrapper }>
-                        <Mail size={ 18 } style={ styles.icon }/>
+                <form onSubmit={handleRegister}>
+                    <div style={styles.inputWrapper}>
+                        <User size={18} style={styles.icon} />
                         <input
-                            type="email"
-                            style={ styles.input }
-                            placeholder="Email"
-                            value={ email }
-                            onChange={ ( e ) => setEmail ( e.target.value ) }
-                            onFocus={ ( e ) => e.target.style.borderColor = '#4ade80' }
-                            onBlur={ ( e ) => e.target.style.borderColor = 'transparent' }
+                            type="text"
+                            style={styles.input}
+                            placeholder="Nome"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                             required
                         />
                     </div>
 
-                    <div style={ styles.inputWrapper }>
-                        <Lock size={ 18 } style={ styles.icon }/>
+                    <div style={styles.inputWrapper}>
+                        <Mail size={18} style={styles.icon} />
+                        <input
+                            type="email"
+                            style={styles.input}
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            required
+                        />
+                    </div>
+
+                    <div style={styles.inputWrapper}>
+                        <Lock size={18} style={styles.icon} />
                         <input
                             type="password"
-                            style={ styles.input }
+                            style={styles.input}
                             placeholder="Password"
-                            value={ password }
-                            onChange={ ( e ) => setPassword ( e.target.value ) }
-                            onFocus={ ( e ) => e.target.style.borderColor = '#4ade80' }
-                            onBlur={ ( e ) => e.target.style.borderColor = 'transparent' }
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
+                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
                             required
                         />
                     </div>
 
                     <button
                         type="submit"
-                        style={ styles.button }
-                        onMouseOver={ ( e ) => e.currentTarget.style.opacity = '0.9' }
-                        onMouseOut={ ( e ) => e.currentTarget.style.opacity = '1' }
+                        style={styles.button}
+                        onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
+                        onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
                     >
-                        Accedi <ArrowRight size={ 20 }/>
+                        Registrati <ArrowRight size={20} />
                     </button>
                 </form>
 
-                <span style={ styles.link }>Non hai un account?
-                    <b style={ {color: '#4ade80', cursor: 'pointer'} } onClick={ () => navigate ( '/register' ) }>Registrati</b>
-                </span>
+                <span style={styles.link}>Hai già un account? <b style={{color: '#4ade80', cursor: 'pointer'}} onClick={() => navigate('/login')}>Accedi</b></span>
             </div>
         </div>
     );
 };
 
-export default LoginPage;
+export default RegisterPage;
