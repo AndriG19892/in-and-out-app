@@ -6,6 +6,7 @@ const connectDB = async ( uri ) => {
         if ( !uri ) {
             throw new Error ( "La stringa URI è vuota o non definita!" );
         }
+        console.log("⏳ Tentativo di connessione a MongoDB..."); // Aggiungi questo log
 
         const conn = await mongoose.connect ( uri );
         console.log ( `✅ MongoDB Connesso: ${ conn.connection.host }` );

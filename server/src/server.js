@@ -8,7 +8,14 @@ const userRoutes = require ( './routes/user.routes' );
 const transactionRoutes = require ( './routes/transaction.routes' );
 
 const app = express ();
-app.use ( cors () );
+app.use ( cors ( {
+    origin: [
+        'https://tua-app-su-netlify.netlify.app',
+        'http://localhost:5173', // Per i tuoi test locali con Vite
+        'http://localhost:3000'
+    ],
+    credentials: true
+} ) );
 app.use ( express.json () );
 //definizione degli endpoing
 app.use ( '/api/auth', authRoutes );
