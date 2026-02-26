@@ -1,9 +1,9 @@
 const express = require ( 'express' );
 const router = express.Router ();
 const {addTransaction, getTransaction, getBalance} = require ( '../controllers/transaction.controller' );
-
-router.post ( '/add', addTransaction );
-router.get ( '/:userId', getTransaction );
-router.get ( '/balance/:userId', getBalance );
+const {protect} = require ( '../middleware/auth.middleware' );
+router.post ( '/add', protect, addTransaction );
+router.get ( '/:userId', protect, getTransaction );
+router.get ( '/balance/:userId', protect, getBalance );
 
 module.exports = router;

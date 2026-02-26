@@ -4,7 +4,6 @@ import {useUser} from "../hooks/useUser.js";
 import {Search, Calendar, ArrowDown, ArrowUp, ChevronLeft, X} from 'lucide-react';
 import {useNavigate} from "react-router-dom";
 import BottomNav from "../components/BottomNav.jsx";
-import axios from "axios";
 
 const TransactionsPage = () => {
     const {user} = useUser ();

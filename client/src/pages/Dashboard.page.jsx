@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
+import api from "../api/axiosConfig.js";
 import { useNavigate } from "react-router-dom";
 import {useUser} from "../hooks/useUser.js";
 import { Wallet, ArrowDown, ArrowUp, Home, List, Activity, User, Calendar } from 'lucide-react';
 import BottomNav from "../components/BottomNav.jsx";
-import axios from "axios";
 
 const DashboardPage = () => {
-    const {user, logout} = useUser();
+    const {user} = useUser();
     const [balance, setBalance] = useState({ entrate: 0, uscite: 0, totale: 0 });
     const [transactions, setTransactions] = useState([]);
     const navigate = useNavigate();
@@ -18,8 +18,10 @@ const DashboardPage = () => {
 
             try {
                 const [resBalance, resList] = await Promise.all([
-                    axios.get(`http://localhost:5000/api/transactions/balance/${userId}`),
-                    axios.get(`http://localhost:5000/api/transactions/${userId}`)
+                    api.get(`/transactions/balance/${userId}`),
+                    api.get(`/transactions/${ userId }`),
+      /*              axios.get(`http://localhost:5000/api/transactions/balance/${userId}`),
+                    axios.get(`http://localhost:5000/api/transactions/${userId}`)*/
                 ]);
                 setBalance(resBalance.data.data);
                 setTransactions(resList.data.data.slice(0, 4));

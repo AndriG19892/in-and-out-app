@@ -1,5 +1,6 @@
 // src/Context/UserContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
+import api from '../api/axiosConfig.js';
 import axios from 'axios';
 
 // Esportiamo il context per permettere allo hook di leggerlo
@@ -26,12 +27,22 @@ export const UserProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const savedId = localStorage.getItem("userId");
-        if (savedId) {
-            fetchUserData(savedId);
-        } else {
+        const loadUser = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    // Usiamo la nostra istanza 'api' che mette già il token nell'header!
+                    const res = await api.get('/auth/me');
+                    setUser(res.data.user);
+                } catch (err) {
+                    console.error("Token non valido o scaduto");
+                    localStorage.clear();
+                    setUser(null);
+                }
+            }
             setLoading(false);
-        }
+        };
+        loadUser();
     }, []);
 
     const login = (userData) => {

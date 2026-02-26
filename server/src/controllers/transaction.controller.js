@@ -3,7 +3,8 @@ const mongoose = require ( 'mongoose' );
 
 exports.addTransaction = async ( req, res ) => {
     try {
-        const {userId, type, amount, category, description, date} = req.body;
+        const userId = req.user.id;
+        const {type, amount, category, description, date} = req.body;
 
         const nuovaTransazione = await Transaction.create ( {
             userId,
@@ -27,10 +28,13 @@ exports.addTransaction = async ( req, res ) => {
 
 exports.getTransaction = async ( req, res ) => {
     try {
-        const {userId} = req.params;
+        // CORREZIONE: req.user contiene già i dati decodificati dal token
+        // Se nel middleware hai usato req.user = decoded, e il token ha { id }, usa quello.
+        const userId = req.user.id || req.user._id;
+
         const transazioni = await Transaction.find ( {userId} ).sort ( {date: -1} );
 
-        res.status ( 201 ).json ( {
+        res.status ( 200 ).json ( { // 200 è più corretto per una GET
             success: true,
             count: transazioni.length,
             data: transazioni
@@ -45,11 +49,12 @@ exports.getTransaction = async ( req, res ) => {
 
 exports.getBalance = async ( req, res ) => {
     try {
-        const {userId} = req.params;
+        // CORREZIONE: come sopra
+        const userId = req.user.id || req.user._id;
+
         const stats = await Transaction.aggregate ( [
-            // 1. filtra solo le transazioni dell'utente specifico
+            // Usa userId correttamente
             {$match: {userId: new mongoose.Types.ObjectId ( userId )},},
-            //2. raggruppa e somma in base al tipo (in, out)
             {
                 $group: {
                     _id: "$type",
@@ -57,17 +62,14 @@ exports.getBalance = async ( req, res ) => {
                 }
             }
         ] );
-        //formattiamo i dati per renderli facili da leggere al frontend
-        const balance = {
-            entrate: 0,
-            uscite: 0,
-            totale: 0
-        };
+
+        const balance = { entrate: 0, uscite: 0, totale: 0 };
         stats.forEach ( item => {
             if ( item._id === 'IN' ) balance.entrate = item.total;
             if ( item._id === 'OUT' ) balance.uscite = item.total;
         } );
         balance.totale = balance.entrate - balance.uscite;
+
         res.status ( 200 ).json ( {
             success: true,
             data: balance
