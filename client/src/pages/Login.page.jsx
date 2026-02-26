@@ -1,29 +1,41 @@
 import React, {useState} from 'react';
 import axios from 'axios';
+import SaveInLocalStorage from '../utils/SaveInLocalStorage.js';
 import {useUser} from '../hooks/useUser.js';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {Mail, Lock, ArrowRight, Wallet} from 'lucide-react';
 
 const LoginPage = () => {
     const navigate = useNavigate ();
-    const location = useLocation ();
     const [email, setEmail] = useState ( '' );
     const [password, setPassword] = useState ( '' );
     const {login} = useUser ();
 
-    const handleLogin = async ( e ) => {
-        e.preventDefault ();
+    const handleLogin = async (e) => {
+        e.preventDefault();
         try {
-            const res = await axios.post ( 'http://localhost:5000/api/auth/login', {email, password} );
-            const userData = res.data.user;
+            const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            console.log ("response from server", res.data);
+            // Destrutturiamo la risposta del tuo backend
+            const { token, user } = res.data;
 
-            if ( userData && userData.id ) {
-                login ( userData );
-                window.location.href = '/dashboard';
+            if (token && user?.id) {
+                // 1. Salviamo l'ID dell'utente
+                SaveInLocalStorage('userId', user.id);
+
+                // 2. Salviamo il Token JWT
+                SaveInLocalStorage('token', token);
+
+                // 3. Aggiorniamo il Context globale
+                login(user);
+
+                // 4. Navighiamo internamente (veloce e senza refresh)
+                navigate('/dashboard');
             }
         } catch (err) {
-            console.error ( "Errore login:", err );
-            alert ( "Credenziali errate" );
+            console.error("Errore login:", err);
+            const errorMsg = err.response?.data?.message || "Credenziali errate";
+            alert(errorMsg);
         }
     };
 
