@@ -1,4 +1,5 @@
 const User = require ( '../models/User.model' );
+const generateToken = require ( '../utils/GenerateToken' );
 const jwt = require ( 'jsonwebtoken' );
 
 exports.register = async ( req, res ) => {
@@ -15,16 +16,17 @@ exports.register = async ( req, res ) => {
         }
         //creo l'utente:
 
-        const user = await User.create ( {
+        const newUser = await User.create ( {
             nome,
             email,
             password,
         } );
-
+        const token = generateToken ( newUser._id );
         res.status ( 201 ).json ( {
             success: true,
             message: "Utente creato con successo!",
-            user: {id: user._id, email: user.email}
+            user: {id: newUser._id, email: newUser.email},
+            token
         } );
     } catch (error) {
         res.status ( 500 ).json ( {
@@ -53,7 +55,8 @@ exports.login = async ( req, res ) => {
                 message: "Password errata"
             } );
         }
-
+        const token = await generateToken ( user._id );
+        console.log ("token generato", token);
         //risposta di successo:
         res.json ( {
             success: true,
@@ -62,7 +65,8 @@ exports.login = async ( req, res ) => {
                 id: user._id,
                 nome: user.nome,
                 email: user.email
-            }
+            },
+            token
         } );
     } catch (error) {
         res.status ( 500 ).json ( {
