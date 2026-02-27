@@ -26,6 +26,33 @@ exports.addTransaction = async ( req, res ) => {
     }
 }
 
+exports.deleteTransaction = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Cerchiamo e eliminiamo la transazione
+        const deletedTransaction = await Transaction.findByIdAndDelete(id);
+
+        if (!deletedTransaction) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Transazione non trovata" 
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: "Transazione eliminata correttamente" 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: "Errore durante l'eliminazione",
+            error: error.message 
+        });
+    }
+};
+
 exports.getTransaction = async ( req, res ) => {
     try {
         // CORREZIONE: req.user contiene già i dati decodificati dal token
