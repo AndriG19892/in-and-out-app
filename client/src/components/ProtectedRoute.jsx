@@ -4,27 +4,20 @@ import { useUser } from '../hooks/useUser.js';
 
 const ProtectedRoute = ({ children }) => {
     const { user, loading } = useUser();
-    const location = useLocation();
-
     const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
 
-    // 1. Finché il Context sta facendo il check iniziale (api.get('/auth/me')), ASPETTIAMO.
+    // Se stiamo ancora verificando (loading è true), fermati qui!
     if (loading) {
-        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Verifica sessione...</div>;
+        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Riconnessione...</div>;
     }
 
-    // 2. LOGICA DI ACCESSO:
-    // Entri se hai l'utente NEL CONTEXT (già verificato) 
-    // OPPURE se hai ancora i dati sul disco (sessione da ripristinare)
-    const isAuthenticated = user || (token && userId);
-
-    if (!isAuthenticated) {
-        // Se non ho né l'uno né l'altro, allora sei davvero un ospite: vai al login
-        return <Navigate to="/login" state={{ from: location }} replace />;
+    // Se il caricamento è FINITO (loading è false) e non abbiamo l'utente 
+    // E non c'è nemmeno un token residuo, allora vai al login.
+    if (!user && !token) {
+        return <Navigate to="/login" replace />;
     }
 
-    // Se arriviamo qui, l'utente è autenticato o lo sarà a breve
+    // Se abbiamo l'utente o almeno il token, mostriamo i figli (Dashboard)
     return children;
 };
 
