@@ -20,8 +20,6 @@ const DashboardPage = () => {
                 const [resBalance, resList] = await Promise.all([
                     api.get(`/transactions/balance/${userId}`),
                     api.get(`/transactions/${ userId }`),
-      /*              axios.get(`http://localhost:5000/api/transactions/balance/${userId}`),
-                    axios.get(`http://localhost:5000/api/transactions/${userId}`)*/
                 ]);
                 setBalance(resBalance.data.data);
                 setTransactions(resList.data.data.slice(0, 4));
