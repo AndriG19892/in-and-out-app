@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from "../api/axiosConfig.js";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Per reindirizzare
 import { User, Mail, Lock, ArrowRight, Wallet } from 'lucide-react'; // Icone
@@ -13,7 +14,7 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             // Assicurati che il tuo backend abbia un endpoint /api/auth/register
-            const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
+            const res = await api.post("/auth/register",{name, email, password});
 
             if (res.data.success) {
                 alert("Registrazione avvenuta con successo! Effettua il login.");
