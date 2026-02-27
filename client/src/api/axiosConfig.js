@@ -7,7 +7,7 @@ const api = axios.create ( {
     baseURL: baseURL,
 } );
 
-console.log("url backend",baseUrl);
+console.log("url backend",baseURL);
 
 //Aggiungiamo un INTERCEPTOR
 api.interceptors.request.use ( config => {
