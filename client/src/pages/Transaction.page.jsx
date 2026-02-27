@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import api from "../api/axiosConfig.js";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Euro, Tag, AlignLeft } from 'lucide-react';
 import axios from "axios";
@@ -132,9 +133,7 @@ const TransactionPage = () => {
                 userId: userId
             };
 
-            console.log("Invio payload al server:", payload);
-
-            const response = await axios.post("http://localhost:5000/api/transactions/add", payload);
+            const response = await api.post("/transactions/add", payload);
 
             if (response.status === 200 || response.status === 201) {
                 navigate("/dashboard");
