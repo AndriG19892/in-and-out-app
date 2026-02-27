@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'; // Per reindirizzare
 import { User, Mail, Lock, ArrowRight, Wallet } from 'lucide-react'; // Icone
 
 const RegisterPage = () => {
-    const [name, setName] = useState('');
+    const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
@@ -14,7 +14,7 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             // Assicurati che il tuo backend abbia un endpoint /api/auth/register
-            const res = await api.post("/auth/register",{name, email, password});
+            const res = await api.post("/auth/register",{nome, email, password});
 
             if (res.data.success) {
                 alert("Registrazione avvenuta con successo! Effettua il login.");
@@ -158,8 +158,8 @@ const RegisterPage = () => {
                             type="text"
                             style={styles.input}
                             placeholder="Nome"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={nome}
+                            onChange={(e) => setNome(e.target.value)}
                             onFocus={(e) => e.target.style.borderColor = '#4ade80'}
                             onBlur={(e) => e.target.style.borderColor = 'transparent'}
                             required
