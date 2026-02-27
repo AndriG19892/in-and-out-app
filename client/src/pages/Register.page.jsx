@@ -14,7 +14,7 @@ const RegisterPage = () => {
         e.preventDefault();
         try {
             // Assicurati che il tuo backend abbia un endpoint /api/auth/register
-            const res = await api.post("/auth/register",{nome, email, password});
+            const res = await api.post("/auth/register",{name, email, password});
 
             if (res.data.success) {
                 alert("Registrazione avvenuta con successo! Effettua il login.");
