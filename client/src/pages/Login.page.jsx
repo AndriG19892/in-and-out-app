@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import api from "../api/axiosConfig.js";
 import axios from 'axios';
 import SaveInLocalStorage from '../utils/SaveInLocalStorage.js';
 import {useUser} from '../hooks/useUser.js';
@@ -11,33 +12,36 @@ const LoginPage = () => {
     const [password, setPassword] = useState ( '' );
     const {login} = useUser ();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
-            console.log ("response from server", res.data);
-            // Destrutturiamo la risposta del tuo backend
-            const { token, user } = res.data;
+const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+        // 2. Usa 'api' invece di 'axios' e usa solo il percorso relativo
+        const res = await api.post('/auth/login', { email, password });
+        
+        console.log("response from server", res.data);
+        const { token, user } = res.data;
 
-            if (token && user?.id) {
-                // 1. Salviamo l'ID dell'utente
-                SaveInLocalStorage('userId', user.id);
+        // Nota: Il backend ora potrebbe mandare user.id o user._id 
+        // a seconda di come lo abbiamo configurato ieri. 
+        const userId = user?.id || user?._id;
 
-                // 2. Salviamo il Token JWT
-                SaveInLocalStorage('token', token);
+        if (token && userId) {
+            // Salvataggio dati
+            localStorage.setItem('userId', userId);
+            localStorage.setItem('token', token);
 
-                // 3. Aggiorniamo il Context globale
-                login(user);
+            // Aggiorniamo il Context
+            login(user);
 
-                // 4. Navighiamo internamente (veloce e senza refresh)
-                navigate('/dashboard');
-            }
-        } catch (err) {
-            console.error("Errore login:", err);
-            const errorMsg = err.response?.data?.message || "Credenziali errate";
-            alert(errorMsg);
+            // Navigazione
+            navigate('/dashboard');
         }
-    };
+    } catch (err) {
+        console.error("Errore login:", err);
+        const errorMsg = err.response?.data?.message || "Credenziali errate";
+        alert(errorMsg);
+    }
+};
 
     const styles = {
         container: {
