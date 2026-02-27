@@ -6,27 +6,25 @@ const ProtectedRoute = ({ children }) => {
     const { user, loading } = useUser();
     const location = useLocation();
 
-    // LEGGIAMO DIRETTAMENTE DAL DISCO AD OGNI RENDER
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
 
+    // 1. Finché il Context sta facendo il check iniziale (api.get('/auth/me')), ASPETTIAMO.
     if (loading) {
-        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Verifica...</div>;
+        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Verifica sessione...</div>;
     }
 
-    // PROTEZIONE DOPPIA:
-    // Se non c'è il token O non c'è l'utente nel context, lo buttiamo fuori.
-    // Nota: Se hai appena ricaricato la pagina, user potrebbe essere null per un attimo,
-    // ma il token ci sarebbe. Quindi usiamo una logica più stringente:
-    if (!token || !userId) {
+    // 2. LOGICA DI ACCESSO:
+    // Entri se hai l'utente NEL CONTEXT (già verificato) 
+    // OPPURE se hai ancora i dati sul disco (sessione da ripristinare)
+    const isAuthenticated = user || (token && userId);
+
+    if (!isAuthenticated) {
+        // Se non ho né l'uno né l'altro, allora sei davvero un ospite: vai al login
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // Se il caricamento è finito e non abbiamo l'utente (e il token è sparito)
-    if (!loading && !user && !token) {
-        return <Navigate to="/login" replace />;
-    }
-
+    // Se arriviamo qui, l'utente è autenticato o lo sarà a breve
     return children;
 };
 
