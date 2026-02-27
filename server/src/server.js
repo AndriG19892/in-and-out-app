@@ -10,7 +10,7 @@ const transactionRoutes = require ( './routes/transaction.routes' );
 const app = express ();
 app.use ( cors ( {
     origin: [
-        'https://inoutapp.netlify.app/',
+        'https://inoutapp.netlify.app',
         'http://localhost:5173', // Per i tuoi test locali con Vite
         'http://localhost:3000'
     ],
