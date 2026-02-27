@@ -1,43 +1,37 @@
 // src/Context/UserContext.jsx
 import React, { createContext, useState, useEffect } from 'react';
 import api from '../api/axiosConfig.js';
-import axios from 'axios';
 
-// Esportiamo il context per permettere allo hook di leggerlo
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Funzione per caricare i dati specifici dell'utente (PROFILO)
     const fetchUserData = async (userId) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/users/profile/${userId}`);
-            // NOTA: Controlla che il tuo backend risponda con { success: true, data: ... }
+            // CORRETTO: Usiamo 'api' e il percorso relativo
+            const res = await api.get(`/users/profile/${userId}`);
             if (res.data.success) {
                 setUser(res.data.data);
             }
         } catch (error) {
             console.error("Errore fetch User:", error.response?.data || error.message);
-            // Fermiamo il logout automatico per ora per debuggare
-            // logout();
-        } finally {
-            setLoading(false);
         }
     };
 
+    // Effetto al caricamento: controlla se l'utente è già loggato (REFRESH)
     useEffect(() => {
         const loadUser = async () => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
-                    // Usiamo la nostra istanza 'api' che mette già il token nell'header!
-                    const res = await api.get('/auth/me');
+                    const res = await api.get('/auth/me'); // Recupera l'utente dal token
                     setUser(res.data.user);
                 } catch (err) {
-                    console.error("Token non valido o scaduto");
-                    localStorage.clear();
-                    setUser(null);
+                    console.error("Sessione scaduta");
+                    logout();
                 }
             }
             setLoading(false);
@@ -46,9 +40,10 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     const login = (userData) => {
-        localStorage.setItem("userId", userData.id || userData._id);
+        const id = userData.id || userData._id;
+        localStorage.setItem("userId", id);
         setUser(userData);
-        fetchUserData(userData.id || userData._id);
+        fetchUserData(id); // Carica i dati del profilo subito dopo il login
     };
 
     const logout = () => {
