@@ -5,6 +5,6 @@ const {protect} = require ( '../middleware/auth.middleware' );
 router.post ( '/add', protect, addTransaction );
 router.get ( '/:userId', protect, getTransaction );
 router.get ( '/balance/:userId', protect, getBalance );
-router.delete('/:id', protect, transactionController.deleteTransaction);
+router.delete('/:id', protect, deleteTransaction);
 
 module.exports = router;
