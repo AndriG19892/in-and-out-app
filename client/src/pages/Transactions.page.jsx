@@ -90,7 +90,7 @@ const TransactionsPage = () => {
         },
         controlsRow: {
             display: 'flex',
-            gap: '10px',
+            gap: '87px',
             marginBottom: '20px',
             width: '100%',
             boxSizing: 'border-box'
@@ -109,7 +109,7 @@ const TransactionsPage = () => {
             borderRadius: '18px',
             border: 'none',
             background: '#ffffff',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+            boxShadow: 'rgb(0 0 0 / 20%) 0px 4px 12px',
             outline: 'none',
             fontSize: '0.9rem',
             fontFamily: '"Nunito", sans-serif',
@@ -121,7 +121,7 @@ const TransactionsPage = () => {
             borderRadius: '18px',
             border: 'none',
             background: '#ffffff',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+            boxShadow: 'rgb(0 0 0 / 20%) 0px 4px 12px',
             outline: 'none',
             fontSize: '0.8rem',
             fontFamily: '"Nunito", sans-serif',
