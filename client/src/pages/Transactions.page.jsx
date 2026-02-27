@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import api from "../api/axiosConfig.js";
 import {useUser} from "../hooks/useUser.js";
-import {Search, Calendar, ArrowDown, ArrowUp, ChevronLeft, X} from 'lucide-react';
+import {Search, Calendar, ArrowDown, ArrowUp, ChevronLeft, X,Trash2} from 'lucide-react';
 import {useNavigate} from "react-router-dom";
 import BottomNav from "../components/BottomNav.jsx";
 
@@ -61,6 +61,23 @@ const TransactionsPage = () => {
 
         setFilteredTransactions ( result );
     }, [searchTerm, filterCategory, filterDate, allTransactions] );
+
+   const handleDelete = async (transactionId) => {
+    if (window.confirm("Vuoi eliminare definitivamente questo movimento?")) {
+        try {
+            // Assicurati che il backend abbia la rotta DELETE /api/transactions/:id
+            await api.delete(`/transactions/${transactionId}`);
+            
+            // Aggiorniamo lo stato locale filtrando via la transazione eliminata
+            const updatedList = allTransactions.filter(t => t._id !== transactionId);
+            setAllTransactions(updatedList);
+            setFilteredTransactions(updatedList);
+        } catch (error) {
+            console.error("Errore eliminazione:", error);
+            alert("Errore durante l'eliminazione del movimento.");
+        }
+    }
+};
 
     const styles = {
         container: {
@@ -229,44 +246,50 @@ const TransactionsPage = () => {
             </div>
 
             {/* Lista Risultati */ }
-            <div style={ {marginTop: '5px', flex: 1} }>
-                { filteredTransactions.length > 0 ? (
-                    filteredTransactions.map ( t => {
-                        const isIn = t.type === 'IN';
-                        return (
-                            <div key={ t._id } style={ styles.transactionItem }>
-                                <div style={ styles.iconCircle ( isIn ) }>
-                                    { isIn ? <ArrowDown size={ 18 } color="#2d6a4f"/> :
-                                        <ArrowUp size={ 18 } color="#a4161a"/> }
-                                </div>
-                                <div style={ {flex: 1} }>
-                                    <div style={ {
-                                        fontWeight: 700,
-                                        color: '#1e3a3a',
-                                        fontSize: '0.9rem'
-                                    } }>{ t.category }</div>
-                                    <div style={ {
-                                        fontSize: '0.7rem',
-                                        color: '#94a3b8',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '4px'
-                                    } }>
-                                        <Calendar size={ 10 }/> { new Date ( t.date ).toLocaleDateString ( 'it-IT' ) }
-                                    </div>
-                                </div>
-                                <div style={ {fontWeight: 800, color: isIn ? '#2d6a4f' : '#a4161a', fontSize: '1rem'} }>
-                                    { isIn ? '+' : '-' } €{ t.amount.toLocaleString ( 'it-IT', {minimumFractionDigits: 2} ) }
-                                </div>
-                            </div>
-                        );
-                    } )
-                ) : (
-                    <div style={ {textAlign: 'center', color: '#94a3b8', marginTop: '40px', fontSize: '0.9rem'} }>
-                        Nessun movimento trovato.
+<div style={{ marginTop: '5px', flex: 1 }}>
+    {filteredTransactions.length > 0 ? (
+        filteredTransactions.map(t => {
+            const isIn = t.type === 'IN';
+            return (
+                <div key={t._id} style={styles.transactionItem}>
+                    <div style={styles.iconCircle(isIn)}>
+                        {isIn ? <ArrowDown size={18} color="#2d6a4f" /> : <ArrowUp size={18} color="#a4161a" />}
                     </div>
-                ) }
-            </div>
+                    
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, color: '#1e3a3a', fontSize: '0.9rem' }}>
+                            {t.category}
+                        </div>
+                        {/* DESCRIZIONE AGGIUNTA QUI */}
+                        <div style={{ fontSize: '0.75rem', color: '#64748b', fontStyle: 'italic', marginBottom: '2px' }}>
+                            {t.description || "Nessuna nota"}
+                        </div>
+                        <div style={{ fontSize: '0.65rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <Calendar size={10} /> {new Date(t.date).toLocaleDateString('it-IT')}
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                        <div style={{ fontWeight: 800, color: isIn ? '#2d6a4f' : '#a4161a', fontSize: '1rem' }}>
+                            {isIn ? '+' : '-'} €{t.amount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                        </div>
+                        {/* TASTO ELIMINA AGGIUNTO QUI */}
+                        <div 
+                            onClick={() => handleDelete(t._id)}
+                            style={{ cursor: 'pointer', padding: '4px' }}
+                        >
+                            <Trash2 size={16} color="#cbd5e1" />
+                        </div>
+                    </div>
+                </div>
+            );
+        })
+    ) : (
+        <div style={{ textAlign: 'center', color: '#94a3b8', marginTop: '40px', fontSize: '0.9rem' }}>
+            Nessun movimento trovato.
+        </div>
+    )}
+</div>
 
             <BottomNav/>
         </div>
