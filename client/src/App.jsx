@@ -8,7 +8,7 @@ import TransacationPage from './pages/Transaction.page.jsx'
 import TransactionsList from './pages/Transactions.page.jsx'
 import ProfilePage from './pages/Profile.page.jsx'
 import RegisterPage from './pages/Register.page.jsx'
-import MainLayout from './layouts/MainLayout';
+import MainLayout from './Layouts/MainLayout';
 
 function App() {
     return (
