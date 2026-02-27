@@ -209,7 +209,7 @@ const handleLogin = async (e) => {
                 </form>
 
                 <span style={ styles.link }>Non hai un account?
-                    <b style={ {color: '#4ade80', cursor: 'pointer'} } onClick={ () => navigate ( '/register' ) }>Registrati</b>
+                    <b style={ {color: '#4ade80', cursor: 'pointer'} } onClick={ () => navigate ( '/register' ) }> Registrati</b>
                 </span>
             </div>
         </div>
