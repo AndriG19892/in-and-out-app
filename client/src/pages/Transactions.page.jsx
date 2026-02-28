@@ -4,6 +4,7 @@ import { useUser } from "../hooks/useUser.js";
 import { Search, Calendar, ArrowDown, ArrowUp, ChevronLeft, X, Trash2 } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/BottomNav.jsx";
+import StatusFeedback from "../components/StatusFeedback.jsx"; // Assicurati che il percorso sia corretto
 
 const TransactionsPage = () => {
     const { user } = useUser();
@@ -13,6 +14,10 @@ const TransactionsPage = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterCategory, setFilterCategory] = useState("Tutte");
     const [filterDate, setFilterDate] = useState("");
+
+    // Stati per il feedback e la gestione eliminazione
+    const [status, setStatus] = useState({ loading: false, msg: "", type: "" });
+    const [transactionToDelete, setTransactionToDelete] = useState(null);
 
     const userId = user?.id || user?._id;
 
@@ -53,17 +58,39 @@ const TransactionsPage = () => {
         setFilteredTransactions(result);
     }, [searchTerm, filterCategory, filterDate, allTransactions]);
 
-    const handleDelete = async (transactionId) => {
-        if (window.confirm("Vuoi eliminare definitivamente questo movimento?")) {
-            try {
-                await api.delete(`/transactions/${transactionId}`);
-                const updatedList = allTransactions.filter(t => t._id !== transactionId);
-                setAllTransactions(updatedList);
-                setFilteredTransactions(updatedList);
-            } catch (error) {
-                console.error("Errore eliminazione:", error);
-                alert("Errore durante l'eliminazione del movimento.");
-            }
+    // 1. Funzione che apre la conferma
+    const askDelete = (id) => {
+        setTransactionToDelete(id);
+        setStatus({
+            loading: false,
+            msg: "Vuoi eliminare definitivamente questo movimento?",
+            type: "confirm"
+        });
+    };
+
+    // 2. Funzione che esegue l'eliminazione effettiva
+    const confirmDelete = async () => {
+        if (!transactionToDelete) return;
+        setStatus({ loading: true, msg: "Eliminazione in corso...", type: "" });
+        try {
+            await api.delete(`/transactions/${transactionToDelete}`);
+
+            const updatedList = allTransactions.filter(t => t._id !== transactionToDelete);
+            setAllTransactions(updatedList);
+            setFilteredTransactions(updatedList);
+
+            setStatus({ loading: false, msg: "Movimento eliminato con successo!", type: "success" });
+            setTransactionToDelete(null);
+
+            // Chiude il messaggio di successo dopo 1.5 secondi
+            setTimeout(() => setStatus({ loading: false, msg: "", type: "" }), 1500);
+        } catch (error) {
+            console.error("Errore eliminazione:", error);
+            setStatus({
+                loading: false,
+                msg: "Errore durante l'eliminazione del movimento.",
+                type: "error"
+            });
         }
     };
 
@@ -74,7 +101,7 @@ const TransactionsPage = () => {
             fontFamily: '"Nunito", sans-serif',
             display: 'flex',
             flexDirection: 'column',
-            overflow: 'hidden', // Blocca lo scroll della pagina intera
+            overflow: 'hidden',
             boxSizing: 'border-box',
         },
         fixedTop: {
@@ -90,7 +117,7 @@ const TransactionsPage = () => {
         },
         controlsRow: {
             display: 'flex',
-            gap: '87px',
+            gap: '87px', // Ripristinato gap normale per mobile
             marginBottom: '20px',
             width: '100%',
             boxSizing: 'border-box'
@@ -105,27 +132,32 @@ const TransactionsPage = () => {
         },
         input: {
             width: '100%',
-            padding: '14px 14px 14px 40px',
+            padding: '14px 14px 14px 44px', // Aumentato spazio a sinistra
             borderRadius: '18px',
-            border: 'none',
+            border: '1px solid #f1f5f9', // Un bordo leggerissimo aiuta la definizione
             background: '#ffffff',
-            boxShadow: 'rgb(0 0 0 / 20%) 0px 4px 12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)', // Ombra più morbida e moderna
             outline: 'none',
             fontSize: '0.9rem',
             fontFamily: '"Nunito", sans-serif',
-            color: '#1e3a3a'
+            color: '#1e3a3a',
+            transition: 'all 0.2s ease'
         },
         dateInput: {
-            width: '100%',
-            padding: '14px 10px',
+            width: '72%',
+            // IL TRUCCO È QUI: padding-left a 44px per liberare lo spazio all'icona
+            padding: '14px 10px 14px 44px',
             borderRadius: '18px',
-            border: 'none',
+            border: '1px solid #f1f5f9',
             background: '#ffffff',
-            boxShadow: 'rgb(0 0 0 / 20%) 0px 4px 12px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             outline: 'none',
-            fontSize: '0.8rem',
+            fontSize: '0.85rem',
             fontFamily: '"Nunito", sans-serif',
-            color: '#1e3a3a'
+            color: '#1e3a3a',
+            cursor: 'pointer',
+            appearance: 'none', // Rimuove stili nativi
+            WebkitAppearance: 'none'
         },
         filterScroll: {
             display: 'flex',
@@ -149,8 +181,8 @@ const TransactionsPage = () => {
         }),
         scrollArea: {
             flex: 1,
-            overflowY: 'auto', // Solo questa zona scorre verticalmente
-            padding: '10px 20px 100px 20px', 
+            overflowY: 'auto',
+            padding: '10px 20px 100px 20px',
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
         },
@@ -179,7 +211,7 @@ const TransactionsPage = () => {
 
     return (
         <div style={styles.container}>
-            {/* PARTE FISSA: Header e Filtri */}
+
             <div style={styles.fixedTop}>
                 <div style={styles.header}>
                     <div onClick={() => navigate(-1)} style={{ cursor: 'pointer' }}>
@@ -208,7 +240,7 @@ const TransactionsPage = () => {
                                 left: '10px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                pointerEvents: 'none' // L'icona non deve bloccare il click
+                                pointerEvents: 'none'
                             } }
                         />
                         <input
@@ -232,7 +264,6 @@ const TransactionsPage = () => {
                 </div>
             </div>
 
-            {/* PARTE SCORREVOLE: Lista Movimenti */}
             <div style={styles.scrollArea} className="hide-scrollbar">
                 {filteredTransactions.length > 0 ? (
                     filteredTransactions.map(t => {
@@ -253,7 +284,8 @@ const TransactionsPage = () => {
                                     <div style={{ fontWeight: 800, color: isIn ? '#2d6a4f' : '#a4161a', fontSize: '1rem' }}>
                                         {isIn ? '+' : '-'} €{t.amount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
                                     </div>
-                                    <div onClick={() => handleDelete(t._id)} style={{ cursor: 'pointer', marginTop: '5px' }}>
+                                    {/* Tasto elimina che ora attiva askDelete */}
+                                    <div onClick={() => askDelete(t._id)} style={{ cursor: 'pointer', marginTop: '5px' }}>
                                         <Trash2 size={16} color="#94a3b8" />
                                     </div>
                                 </div>
@@ -266,7 +298,16 @@ const TransactionsPage = () => {
                     </div>
                 )}
             </div>
-
+            <StatusFeedback
+                loading={status.loading}
+                message={status.msg}
+                type={status.type}
+                onConfirm={confirmDelete}
+                onClose={() => {
+                    setStatus({loading: false, msg: "", type: ""});
+                    setTransactionToDelete(null);
+                }}
+            />
             <BottomNav />
         </div>
     );
