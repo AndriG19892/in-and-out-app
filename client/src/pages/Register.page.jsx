@@ -1,28 +1,40 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import api from "../api/axiosConfig.js";
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Per reindirizzare
-import { User, Mail, Lock, ArrowRight, Wallet } from 'lucide-react'; // Icone
+import StatusFeedback from "../components/StatusFeedback.jsx";
+import {useNavigate} from 'react-router-dom'; // Per reindirizzare
+import {User, Mail, Lock, ArrowRight, Wallet} from 'lucide-react'; // Icone
 
 const RegisterPage = () => {
-    const [nome, setNome] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const navigate = useNavigate();
+    const [status, setStatus] = useState ( {loading: false, msg: "", type: ""} );
+    const [nome, setNome] = useState ( '' );
+    const [email, setEmail] = useState ( '' );
+    const [password, setPassword] = useState ( '' );
+    const navigate = useNavigate ();
 
-    const handleRegister = async (e) => {
-        e.preventDefault();
+    const handleRegister = async ( e ) => {
+        e.preventDefault ();
+        //evita i click multipli durante il caricamento
+        if ( status.loading ) return;
+        setStatus ( {loading: true, msg: "", type: ""} );
         try {
             // Assicurati che il tuo backend abbia un endpoint /api/auth/register
-            const res = await api.post("/auth/register",{nome, email, password});
+            const res = await api.post ( "/auth/register", {nome, email, password} );
 
-            if (res.data.success) {
-                alert("Registrazione avvenuta con successo! Effettua il login.");
-                navigate('/login'); // Reindirizza al login dopo la registrazione
+            if ( res.data.success ) {
+                setStatus ( {
+                    loading: false,
+                    msg: "Registrazione avvenuta con successo!",
+                    type: "success",
+                } )
+                setTimeout ( () => navigate ( "/dashboard" ), 2000 );
             }
-        } catch (err) {
-            console.error("Errore registrazione:", err.response?.data || err.message);
-            alert(err.response?.data?.message || "Errore durante la registrazione.");
+        } catch (error) {
+            console.error ( "Errore registrazione:", error.response?.data || error.message );
+            setStatus ( {
+                loading: false,
+                msg: error.response?.data?.message || "Errore durante la registrazione.",
+                type: "error",
+            } )
         }
     };
 
@@ -137,74 +149,82 @@ const RegisterPage = () => {
     };
 
     return (
-        <div style={styles.container}>
-            <div style={styles.headerBackground}></div>
+        <div style={ styles.container }>
+            <StatusFeedback
+                loading={ status.loading }
+                message={ status.msg }
+                type={ status.type }
+                onClose={ () => setStatus ( {...status, msg: ""} ) }
+            />
+            <div style={ styles.headerBackground }></div>
 
-            <div style={styles.logoWrapper}>
-                <div style={styles.logoIcon}>
-                    <Wallet size={40} />
+            <div style={ styles.logoWrapper }>
+                <div style={ styles.logoIcon }>
+                    <Wallet size={ 40 }/>
                 </div>
-                <h1 style={styles.headerTitle}>In&Out</h1>
+                <h1 style={ styles.headerTitle }>In&Out</h1>
             </div>
 
-            <div style={styles.card}>
-                <h2 style={{margin: '0 0 10px 0', color: '#1e3a3a', fontWeight: 800}}>Crea un account</h2>
-                <p style={{margin: '0 0 30px 0', color: '#64748b', fontSize: '0.9rem'}}>Inizia a gestire le tue finanze oggi stesso</p>
+            <div style={ styles.card }>
+                <h2 style={ {margin: '0 0 10px 0', color: '#1e3a3a', fontWeight: 800} }>Crea un account</h2>
+                <p style={ {margin: '0 0 30px 0', color: '#64748b', fontSize: '0.9rem'} }>Inizia a gestire le tue
+                    finanze oggi stesso</p>
 
-                <form onSubmit={handleRegister}>
-                    <div style={styles.inputWrapper}>
-                        <User size={18} style={styles.icon} />
+                <form onSubmit={ handleRegister }>
+                    <div style={ styles.inputWrapper }>
+                        <User size={ 18 } style={ styles.icon }/>
                         <input
                             type="text"
-                            style={styles.input}
+                            style={ styles.input }
                             placeholder="Nome"
-                            value={nome}
-                            onChange={(e) => setNome(e.target.value)}
-                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            value={ nome }
+                            onChange={ ( e ) => setNome ( e.target.value ) }
+                            onFocus={ ( e ) => e.target.style.borderColor = '#4ade80' }
+                            onBlur={ ( e ) => e.target.style.borderColor = 'transparent' }
                             required
                         />
                     </div>
 
-                    <div style={styles.inputWrapper}>
-                        <Mail size={18} style={styles.icon} />
+                    <div style={ styles.inputWrapper }>
+                        <Mail size={ 18 } style={ styles.icon }/>
                         <input
                             type="email"
-                            style={styles.input}
+                            style={ styles.input }
                             placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            value={ email }
+                            onChange={ ( e ) => setEmail ( e.target.value ) }
+                            onFocus={ ( e ) => e.target.style.borderColor = '#4ade80' }
+                            onBlur={ ( e ) => e.target.style.borderColor = 'transparent' }
                             required
                         />
                     </div>
 
-                    <div style={styles.inputWrapper}>
-                        <Lock size={18} style={styles.icon} />
+                    <div style={ styles.inputWrapper }>
+                        <Lock size={ 18 } style={ styles.icon }/>
                         <input
                             type="password"
-                            style={styles.input}
+                            style={ styles.input }
                             placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            onFocus={(e) => e.target.style.borderColor = '#4ade80'}
-                            onBlur={(e) => e.target.style.borderColor = 'transparent'}
+                            value={ password }
+                            onChange={ ( e ) => setPassword ( e.target.value ) }
+                            onFocus={ ( e ) => e.target.style.borderColor = '#4ade80' }
+                            onBlur={ ( e ) => e.target.style.borderColor = 'transparent' }
                             required
                         />
                     </div>
 
                     <button
                         type="submit"
-                        style={styles.button}
-                        onMouseOver={(e) => e.currentTarget.style.opacity = '0.9'}
-                        onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+                        style={ styles.button }
+                        onMouseOver={ ( e ) => e.currentTarget.style.opacity = '0.9' }
+                        onMouseOut={ ( e ) => e.currentTarget.style.opacity = '1' }
                     >
-                        Registrati <ArrowRight size={20} />
+                        Registrati <ArrowRight size={ 20 }/>
                     </button>
                 </form>
 
-                <span style={styles.link}>Hai già un account? <b style={{color: '#4ade80', cursor: 'pointer'}} onClick={() => navigate('/login')}>Accedi</b></span>
+                <span style={ styles.link }>Hai già un account? <b style={ {color: '#4ade80', cursor: 'pointer'} }
+                                                                   onClick={ () => navigate ( '/login' ) }>Accedi</b></span>
             </div>
         </div>
     );

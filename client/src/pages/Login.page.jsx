@@ -1,47 +1,57 @@
 import React, {useState} from 'react';
-import api from "../api/axiosConfig.js";
-import axios from 'axios';
-import SaveInLocalStorage from '../utils/SaveInLocalStorage.js';
 import {useUser} from '../hooks/useUser.js';
 import {useNavigate} from 'react-router-dom';
 import {Mail, Lock, ArrowRight, Wallet} from 'lucide-react';
+import api from "../api/axiosConfig.js";
+import SaveInLocalStorage from '../utils/SaveInLocalStorage.js';
+import StatusFeedback from "../components/StatusFeedback.jsx";
 
 const LoginPage = () => {
+    const [status, setStatus] = useState ( {loading: false, msg: "", type: ""} );
     const navigate = useNavigate ();
     const [email, setEmail] = useState ( '' );
     const [password, setPassword] = useState ( '' );
     const {login} = useUser ();
 
-const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-        // 2. Usa 'api' invece di 'axios' e usa solo il percorso relativo
-        const res = await api.post('/auth/login', { email, password });
-        
-        console.log("response from server", res.data);
-        const { token, user } = res.data;
+    const handleLogin = async ( e ) => {
+        e.preventDefault ();
 
-        // Nota: Il backend ora potrebbe mandare user.id o user._id 
-        // a seconda di come lo abbiamo configurato ieri. 
-        const userId = user?.id || user?._id;
+        //evita i click multipli durante il caricamento
+        if ( status.loading ) return;
+        setStatus ( {loading: true, msg: "Attendere...", type: ""} );
+        try {
+            // 2. Usa 'api' invece di 'axios' e usa solo il percorso relativo
+            const res = await api.post ( '/auth/login', {email, password} );
 
-        if (token && userId) {
-            // Salvataggio dati
-            localStorage.setItem('userId', userId);
-            localStorage.setItem('token', token);
+            console.log ( "response from server", res.data );
+            const {token, user} = res.data;
 
-            // Aggiorniamo il Context
-            login(user);
+            const userId = user?.id || user?._id;
 
-            // Navigazione
-            navigate('/dashboard');
+            if ( token && userId && res.data.success ) {
+                setStatus ( {
+                    loading: false,
+                    msg: "Login eseguito!",
+                    type: "success",
+                } );
+                // Salvataggio dati
+                SaveInLocalStorage ( 'userId', userId );
+                SaveInLocalStorage ( 'token', token );
+                // Aggiorniamo il Context
+                login ( user );
+
+                // Navigazione
+                setTimeout ( () => navigate ( "/dashboard" ), 2000 );
+            }
+        } catch (error) {
+            console.error ( "Errore login:", error );
+            setStatus ( {
+                loading: false,
+                msg: error.response?.data?.message || "Credenziali errate",
+                type: "error",
+            } )
         }
-    } catch (err) {
-        console.error("Errore login:", err);
-        const errorMsg = err.response?.data?.message || "Credenziali errate";
-        alert(errorMsg);
-    }
-};
+    };
 
     const styles = {
         container: {
@@ -155,6 +165,12 @@ const handleLogin = async (e) => {
 
     return (
         <div style={ styles.container }>
+            <StatusFeedback
+                loading={ status.loading }
+                message={ status.msg }
+                type={ status.type }
+                onClose={ () => setStatus ( {...status, msg: ""} ) }
+            />
             <div style={ styles.headerBackground }></div>
 
             <div style={ styles.logoWrapper }>
@@ -209,7 +225,8 @@ const handleLogin = async (e) => {
                 </form>
 
                 <span style={ styles.link }>Non hai un account?
-                    <b style={ {color: '#4ade80', cursor: 'pointer'} } onClick={ () => navigate ( '/register' ) }> Registrati</b>
+                    <b style={ {color: '#4ade80', cursor: 'pointer'} }
+                       onClick={ () => navigate ( '/register' ) }> Registrati</b>
                 </span>
             </div>
         </div>

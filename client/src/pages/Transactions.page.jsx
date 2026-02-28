@@ -200,6 +200,17 @@ const TransactionsPage = () => {
                     </div>
 
                     <div style={styles.dateWrapper}>
+                        <Calendar
+                            size={ 16 }
+                            color="#94a3b8"
+                            style={ {
+                                position: 'absolute',
+                                left: '10px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                pointerEvents: 'none' // L'icona non deve bloccare il click
+                            } }
+                        />
                         <input
                             type="date"
                             style={styles.dateInput}
