@@ -84,9 +84,9 @@ const TransactionPage = () => {
         backBtn: {
             background: '#ffffff',
             border: 'none',
-            width: '45px',
-            height: '45px',
-            borderRadius: '15px',
+            width: '57px',
+            height: '57px',
+            borderRadius: '17px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
