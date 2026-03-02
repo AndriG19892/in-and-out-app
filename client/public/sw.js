@@ -1,17 +1,25 @@
-const CACHE_NAME = 'in-out-cache-v2'; // Incrementa v1 in v2 quando fai modifiche grosse
+// public/sw.js
+
+const CACHE_NAME = 'in-out-cache-v1.0.6'; // <--- Cambia questo
 
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Forza l'installazione immediata
+  // Forza il Service Worker appena scaricato a diventare attivo subito
+  self.skipWaiting(); 
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim()); // Prende il controllo delle pagine immediatamente
-});
-
-self.addEventListener('fetch', (event) => {
-  // Strategia: Network First (prova il server, se fallisce usa la cache)
-  // Ottimo per app finanziarie dove i dati devono essere freschi
-  event.respondWith(
-    fetch(event.request).catch(() => caches.match(event.request))
+  // Elimina le vecchie cache per liberare spazio
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Cancellazione vecchia cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
+  return self.clients.claim();
 });
