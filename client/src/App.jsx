@@ -39,14 +39,13 @@ useEffect(() => {
 
     return (
         <div style={ {backgroundColor: '#1a3c4a', minHeight: '100vh'} }>
-            <UserProvider>
-                {/* Il componente di feedback per l'aggiornamento è globale */}
+                            {/* Il componente di feedback per l'aggiornamento è globale */}
                 <StatusFeedback 
                     {...updateStatus}
                     onConfirm={applyUpdate}
                     onClose={() => setUpdateStatus({ loading: false, msg: "", type: "" })}
                 />
-
+            <UserProvider>
                 <Routes>
                     <Route path="/login" element={ <LoginPage/> }/>
                     <Route path="/register" element={ <RegisterPage/> }/>
