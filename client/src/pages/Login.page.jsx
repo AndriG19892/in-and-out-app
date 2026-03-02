@@ -41,7 +41,7 @@ const LoginPage = () => {
                 login ( user );
 
                 // Navigazione
-                setTimeout ( () => navigate ( "/dashboard" ), 2000 );
+                setTimeout ( () => navigate ( "/dashboard" ), 1500 );
             }
         } catch (error) {
             console.error ( "Errore login:", error );
