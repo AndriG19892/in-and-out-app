@@ -1,4 +1,4 @@
-const CACHE_NAME = 'in-out-cache-v1'; // Incrementa v1 in v2 quando fai modifiche grosse
+const CACHE_NAME = 'in-out-cache-v2'; // Incrementa v1 in v2 quando fai modifiche grosse
 
 self.addEventListener('install', (event) => {
   self.skipWaiting(); // Forza l'installazione immediata
