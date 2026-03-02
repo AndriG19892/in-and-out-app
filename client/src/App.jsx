@@ -1,4 +1,5 @@
 import './App.css'
+import React, { useState, useEffect } from "react"; // Aggiunto useState e useEffect
 import {Routes, Route, Navigate} from "react-router-dom";
 import {UserProvider} from "./Context/UserContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -9,11 +10,43 @@ import TransactionsList from './pages/Transactions.page.jsx'
 import ProfilePage from './pages/Profile.page.jsx'
 import RegisterPage from './pages/Register.page.jsx'
 import MainLayout from './Layouts/MainLayout';
+import StatusFeedback from './components/StatusFeedback.jsx'; // Importa il tuo componente
 
 function App() {
+    // Stato per gestire l'avviso di aggiornamento
+    const [updateStatus, setUpdateStatus] = useState({ loading: false, msg: "", type: "" });
+
+    useEffect(() => {
+        // Ascolta l'evento lanciato dal main.jsx
+        const handleUpdate = () => {
+            setUpdateStatus({
+                loading: false,
+                msg: "Nuova versione disponibile! Vuoi aggiornare l'app ora?",
+                type: "confirm"
+            });
+        };
+
+        window.addEventListener('pwa-update-available', handleUpdate);
+        
+        // Pulizia listener allo smontaggio
+        return () => window.removeEventListener('pwa-update-available', handleUpdate);
+    }, []);
+
+    const applyUpdate = () => {
+        // Ricarica la pagina forzando il browser a leggere i nuovi file
+        window.location.reload();
+    };
+
     return (
         <div style={ {backgroundColor: '#1a3c4a', minHeight: '100vh'} }>
             <UserProvider>
+                {/* Il componente di feedback per l'aggiornamento è globale */}
+                <StatusFeedback 
+                    {...updateStatus}
+                    onConfirm={applyUpdate}
+                    onClose={() => setUpdateStatus({ loading: false, msg: "", type: "" })}
+                />
+
                 <Routes>
                     <Route path="/login" element={ <LoginPage/> }/>
                     <Route path="/register" element={ <RegisterPage/> }/>
@@ -39,7 +72,6 @@ function App() {
                                 <ProfilePage/>
                             </MainLayout>
                         </ProtectedRoute>
-
                     }/>
                     <Route path="*" element={ <Navigate to="/login"/> }/>
                 </Routes>
@@ -48,4 +80,4 @@ function App() {
     )
 }
 
-export default App
+export default App;
