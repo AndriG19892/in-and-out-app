@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../api/axiosConfig.js";
+import StatusFeedback from "../components/StatusFeedback.jsx";
 import { useNavigate } from "react-router-dom";
 import {useUser} from "../hooks/useUser.js";
 import { Wallet, ArrowDown, ArrowUp, Home, List, Activity, User, Calendar } from 'lucide-react';
@@ -11,11 +12,14 @@ const DashboardPage = () => {
     const [transactions, setTransactions] = useState([]);
     const navigate = useNavigate();
     const userId = user?.id || user?._id;
+    const [status, setStatus] = useState({ loading: true, msg: "", type: "" });
 
     useEffect(() => {
         const fetchData = async () => {
             if (!userId) return; // Se l'utente non è ancora caricato, non fare nulla
-
+            
+            // Attiviamo il caricamento
+            setStatus({ loading: true, msg: "Recupero i tuoi dati...", type: "" });
             try {
                 const [resBalance, resList] = await Promise.all([
                     api.get(`/transactions/balance/${userId}`),
@@ -23,8 +27,16 @@ const DashboardPage = () => {
                 ]);
                 setBalance(resBalance.data.data);
                 setTransactions(resList.data.data.slice(0, 4));
+
+                // Caricamento finito con successo
+                setStatus({ loading: false, msg: "", type: "" });
             } catch (error) {
                 console.error("Errore recupero dati:", error);
+                setStatus({ 
+                loading: false, 
+                msg: "Errore nel caricamento dati", 
+                type: "error" 
+            });
             }
         };
 
@@ -293,6 +305,12 @@ const DashboardPage = () => {
                 </div>
             </div>
             <BottomNav/>
+            <StatusFeedback 
+                loading={status.loading} 
+                message={status.msg} 
+                type={status.type} 
+                onClose={() => setStatus({ ...status, msg: "" })}
+                />
         </div>
     );
 };
