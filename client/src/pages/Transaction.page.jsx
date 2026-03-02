@@ -42,7 +42,7 @@ const TransactionPage = () => {
                     type: "success",
                 })
                 //torno alla dashboard dopo un secondo
-                setTimeout ( () => navigate ( "/dashboard" ), 2000 );
+                setTimeout ( () => navigate ( "/dashboard" ), 1500 );
             }
         } catch (error) {
             // Log dettagliato per capire COSA dice il server
