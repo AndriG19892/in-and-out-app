@@ -1,14 +1,18 @@
 import React from 'react';
 import {Loader2, AlertCircle, CheckCircle2, X, HelpCircle} from "lucide-react";
 
-const StatusFeedback = ( {loading, message, type, onClose, onConfirm} ) => { // Aggiunto onConfirm
+const StatusFeedback = ( {loading, message, type, onClose, onConfirm} ) => {
+    // Se non c'è nulla da mostrare, non renderizzare nemmeno l'overlay
     if ( !loading && !message ) return null;
 
     const isConfirm = type === 'confirm';
 
+    // Determina il testo del pulsante d'azione
+    const confirmLabel = message?.toLowerCase().includes("aggiorna") ? "Aggiorna" : "Elimina";
+
     return (
-        <div style={ styles.overlay }> {/* Overlay sempre presente per bloccare lo sfondo */ }
-            {/* OVERLAY DI CARICAMENTO */ }
+        <div style={ styles.overlay }>
+            {/* OVERLAY DI CARICAMENTO */}
             { loading && (
                 <div style={ styles.loaderContainer }>
                     <Loader2 size={ 48 } className="animate-spin" color="#4ade80"/>
@@ -16,29 +20,56 @@ const StatusFeedback = ( {loading, message, type, onClose, onConfirm} ) => { // 
                 </div>
             ) }
 
-            {/* BANNER O BOX DI CONFERMA */ }
+            {/* BOX DI MESSAGGIO / CONFERMA */}
             { message && !loading && (
-                <div style={ {...styles.messageBox, ...styles[type], position: isConfirm ? 'relative' : 'fixed'} }>
-                    <div style={ styles.iconContainer }>
-                        { type === 'error' && <AlertCircle size={ 20 }/> }
-                        { type === 'success' && <CheckCircle2 size={ 20 }/> }
-                        { type === 'confirm' && <HelpCircle size={ 22 }/> }
+                <div style={ {
+                    ...styles.messageBox, 
+                    ...styles[type], 
+                    // Forza il layout colonna se è un confirm, altrimenti riga
+                    flexDirection: isConfirm ? 'column' : 'row',
+                    alignItems: isConfirm ? 'center' : 'center',
+                    textAlign: isConfirm ? 'center' : 'left'
+                } }>
+                    <div style={ {
+                        ...styles.iconContainer, 
+                        marginBottom: isConfirm ? '15px' : '0',
+                        marginRight: isConfirm ? '0' : '12px'
+                    } }>
+                        { type === 'error' && <AlertCircle size={ 24 }/> }
+                        { type === 'success' && <CheckCircle2 size={ 24 }/> }
+                        { type === 'confirm' && <HelpCircle size={ 32 } color="#4ade80"/> }
                     </div>
 
                     <div style={ styles.textContainer }>
-                        <span style={ {display: 'block', marginBottom: isConfirm ? '15px' : '0'} }>{ message }</span>
+                        <span style={ {
+                            display: 'block', 
+                            marginBottom: isConfirm ? '20px' : '0',
+                            fontSize: isConfirm ? '1.1rem' : '0.9rem'
+                        } }>
+                            { message }
+                        </span>
 
-                        {/* PULSANTI AGGIUNTI SOLO PER IL TIPO CONFIRM */ }
                         { isConfirm && (
-                            <div style={ {display: 'flex', gap: '10px'} }>
-                                <button onClick={ onClose } style={ styles.btnCancel }>Annulla</button>
-                                <button onClick={ onConfirm } style={ styles.btnDelete }>Elimina</button>
+                            <div style={ {display: 'flex', gap: '12px', width: '100%'} }>
+                                <button onClick={ onClose } style={ styles.btnCancel }>
+                                    Annulla
+                                </button>
+                                <button 
+                                    onClick={ onConfirm } 
+                                    style={ {
+                                        ...styles.btnConfirm,
+                                        background: confirmLabel === "Aggiorna" ? "#4ade80" : "#a4161a"
+                                    } }>
+                                    { confirmLabel }
+                                </button>
                             </div>
                         ) }
                     </div>
 
                     { !isConfirm && onClose && (
-                        <button onClick={ onClose } style={ styles.closeBtn }><X size={ 18 }/></button>
+                        <button onClick={ onClose } style={ styles.closeBtn }>
+                            <X size={ 18 }/>
+                        </button>
                     ) }
                 </div>
             ) }
@@ -51,55 +82,59 @@ const styles = {
         position: 'fixed',
         top: 0,
         left: 0,
-        right: 0, // Aggiunto per coprire tutto l'asse X
-        bottom: 0, // Aggiunto per coprire tutto l'asse Y
         width: '100vw',
         height: '100vh',
-        background: 'rgba(0, 0, 0, 0.4)', // Scuriamo un po' di più per vedere se appare
+        background: 'rgba(15, 23, 42, 0.7)', // Più scuro per risaltare il box
         backdropFilter: 'blur(8px)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 999999, // Un numero esagerato per stare sopra a tutto
+        zIndex: 999999, 
+        padding: '20px',
+        boxSizing: 'border-box'
     },
-    loaderContainer: {textAlign: 'center'},
+    loaderContainer: { textAlign: 'center' },
     loaderText: {
-        marginTop: '15px', color: '#1e3a3a',
+        marginTop: '15px', color: '#ffffff',
         fontWeight: '800', fontSize: '1.1rem',
         fontFamily: '"Nunito", sans-serif'
     },
     messageBox: {
-        width: '90%', maxWidth: '400px', padding: '20px', borderRadius: '18px',
-        display: 'flex', alignItems: 'center', zIndex: 10000,
-        boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
+        width: '100%', 
+        maxWidth: '350px', 
+        padding: '25px', 
+        borderRadius: '28px',
+        display: 'flex', 
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2)',
         fontFamily: '"Nunito", sans-serif',
+        boxSizing: 'border-box'
     },
-    iconContainer: {marginRight: '12px', display: 'flex', alignItems: 'center'},
-    textContainer: {flex: 1, fontSize: '0.9rem', fontWeight: '700'},
-    error: {background: '#f8d7da', color: '#a4161a', border: '1px solid #f5c2c7'},
-    success: {background: '#d8f3dc', color: '#2d6a4f', border: '1px solid #b7e4c7'},
-    confirm: {background: '#ffffff', color: '#1e3a3a', border: '1px solid #e2e8f0', flexDirection: 'column'},
-    closeBtn: {background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', display: 'flex'},
-    // Nuovi stili minimi per i bottoni
+    iconContainer: { display: 'flex', alignItems: 'center' },
+    textContainer: { flex: 1, fontWeight: '700' },
+    error: { background: '#f8d7da', color: '#a4161a', border: '1px solid #f5c2c7' },
+    success: { background: '#d8f3dc', color: '#2d6a4f', border: '1px solid #b7e4c7' },
+    confirm: { background: '#ffffff', color: '#1e3a3a' },
+    closeBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', marginLeft: '10px' },
     btnCancel: {
         flex: 1,
-        padding: '10px',
-        borderRadius: '12px',
+        padding: '12px',
+        borderRadius: '15px',
         border: 'none',
         background: '#f1f5f9',
         color: '#64748b',
-        fontWeight: '700',
-        cursor: 'pointer'
+        fontWeight: '800',
+        cursor: 'pointer',
+        fontSize: '0.9rem'
     },
-    btnDelete: {
+    btnConfirm: { // Rinominato da btnDelete per chiarezza
         flex: 1,
-        padding: '10px',
-        borderRadius: '12px',
+        padding: '12px',
+        borderRadius: '15px',
         border: 'none',
-        background: '#a4161a',
         color: '#ffffff',
-        fontWeight: '700',
-        cursor: 'pointer'
+        fontWeight: '800',
+        cursor: 'pointer',
+        fontSize: '0.9rem'
     }
 };
 
