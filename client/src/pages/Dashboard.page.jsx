@@ -14,6 +14,8 @@ const DashboardPage = () => {
     const userId = user?.id || user?._id;
     const [status, setStatus] = useState({ loading: true, msg: "", type: "" });
 
+    const APP_VERSION = "1.0.5";
+
     useEffect(() => {
         const fetchData = async () => {
             if (!userId) return; // Se l'utente non è ancora caricato, non fare nulla
@@ -203,6 +205,15 @@ const DashboardPage = () => {
             justifyContent: 'center',
             marginRight: '12px'
         }),
+        versionBadge: {
+            textAlign: 'center',
+            padding: '20px 0 10px 0',
+            fontSize: '10px',
+            fontWeight: '700',
+            color: '#94a3b8',
+            opacity: 0.5,
+            letterSpacing: '0.5px'
+        }
     };
 
     return (
@@ -302,6 +313,10 @@ const DashboardPage = () => {
                             Nessun movimento trovato
                         </div>
                     ) }
+                    {/* INDICATORE VERSIONE APP */}
+                    <div style={ styles.versionBadge }>
+                        In&Out v{ APP_VERSION }
+                    </div>
                 </div>
             </div>
             <BottomNav/>
