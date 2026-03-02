@@ -21,7 +21,7 @@ function App() {
         const handleUpdate = () => {
             setUpdateStatus({
                 loading: false,
-                msg: "Nuova versione disponibile! Vuoi aggiornare l'app ora?",
+                msg: "TEST VISIVO: Vedi questo messaggio?",
                 type: "confirm"
             });
         };
