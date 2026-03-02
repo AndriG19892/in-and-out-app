@@ -1,5 +1,5 @@
+// main.jsx
 import React from 'react';
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
@@ -13,20 +13,15 @@ createRoot(document.getElementById('root')).render(
   </React.StrictMode>
 );
 
-// LOGICA PER AGGIORNAMENTO PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(reg => {
       reg.onupdatefound = () => {
         const installingWorker = reg.installing;
         installingWorker.onstatechange = () => {
-          if (installingWorker.state === 'installed') {
-            if (navigator.serviceWorker.controller) {
-              // Viene attivato solo se esiste già una versione precedente
-              if (window.confirm("Nuova versione disponibile! Ricaricare l'app per aggiornare?")) {
-                window.location.reload();
-              }
-            }
+          if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Lanciamo l'evento personalizzato invece del confirm nativo
+            window.dispatchEvent(new Event('pwa-update-available'));
           }
         };
       };
