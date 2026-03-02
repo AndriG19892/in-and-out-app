@@ -19,8 +19,10 @@ function App() {
 useEffect(() => {
     console.log("App.jsx: Monitoraggio aggiornamenti avviato...");
 
-    const handleUpdate = () => {
-        console.log("⚠️ EVENTO RICEVUTO! Cambio lo stato...");
+    const handleUpdate = (e) => {
+        // Log di emergenza per vedere se il segnale arriva
+        console.log("⚠️ SEGNALE RICEVUTO DALLA CONSOLE O DAL SW!", e);
+        
         setUpdateStatus({
             loading: false,
             msg: "Nuova versione disponibile! Vuoi aggiornare l'app ora?",
@@ -28,7 +30,9 @@ useEffect(() => {
         });
     };
 
+    // Usiamo 'pwa-update-available' (assicurati che sia identico ovunque)
     window.addEventListener('pwa-update-available', handleUpdate);
+    
     return () => window.removeEventListener('pwa-update-available', handleUpdate);
 }, []);
 
