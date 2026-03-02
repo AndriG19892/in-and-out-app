@@ -10,25 +10,8 @@ import TransactionsList from './pages/Transactions.page.jsx'
 import ProfilePage from './pages/Profile.page.jsx'
 import RegisterPage from './pages/Register.page.jsx'
 import MainLayout from './Layouts/MainLayout';
-import StatusFeedback from './components/StatusFeedback.jsx'; // Importa il tuo componente
 
 function App() {
-    // Stato per gestire l'avviso di aggiornamento
-    const [updateStatus, setUpdateStatus] = useState({ loading: false, msg: "", type: "" });
-
-useEffect(() => {
-    console.log("App.jsx: Monitoraggio aggiornamenti avviato...");
-
-    const handleUpdate = (e) => {
-        // Log di emergenza per vedere se il segnale arriva
-        console.log("⚠️ SEGNALE RICEVUTO DALLA CONSOLE O DAL SW!", e);
-        
-        setUpdateStatus({
-            loading: false,
-            msg: "Nuova versione disponibile! Vuoi aggiornare l'app ora?",
-            type: "confirm"
-        });
-    };
 
     // Usiamo 'pwa-update-available' (assicurati che sia identico ovunque)
     window.addEventListener('pwa-update-available', handleUpdate);
