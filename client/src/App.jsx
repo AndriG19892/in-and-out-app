@@ -16,21 +16,21 @@ function App() {
     // Stato per gestire l'avviso di aggiornamento
     const [updateStatus, setUpdateStatus] = useState({ loading: false, msg: "", type: "" });
 
-    useEffect(() => {
-        // Ascolta l'evento lanciato dal main.jsx
-        const handleUpdate = () => {
-            setUpdateStatus({
-                loading: false,
-                msg: "TEST VISIVO: Vedi questo messaggio?",
-                type: "confirm"
-            });
-        };
+useEffect(() => {
+    console.log("App.jsx: Monitoraggio aggiornamenti avviato...");
 
-        window.addEventListener('pwa-update-available', handleUpdate);
-        
-        // Pulizia listener allo smontaggio
-        return () => window.removeEventListener('pwa-update-available', handleUpdate);
-    }, []);
+    const handleUpdate = () => {
+        console.log("⚠️ EVENTO RICEVUTO! Cambio lo stato...");
+        setUpdateStatus({
+            loading: false,
+            msg: "Nuova versione disponibile! Vuoi aggiornare l'app ora?",
+            type: "confirm"
+        });
+    };
+
+    window.addEventListener('pwa-update-available', handleUpdate);
+    return () => window.removeEventListener('pwa-update-available', handleUpdate);
+}, []);
 
     const applyUpdate = () => {
         // Ricarica la pagina forzando il browser a leggere i nuovi file
