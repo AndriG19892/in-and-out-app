@@ -80,6 +80,7 @@ useEffect(() => {
                 </Routes>
             </UserProvider>
         </div>
+        </div>
     )
 }
 
