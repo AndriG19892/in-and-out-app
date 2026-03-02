@@ -43,7 +43,7 @@ useEffect(() => {
 
     return (
         <div style={ {backgroundColor: '#1a3c4a', minHeight: '100vh'} }>
-                            {/* Il componente di feedback per l'aggiornamento è globale */}
+                  <div style={ {backgroundColor: '#1a3c4a', minHeight: '100vh', position: 'relative'} }>          {/* Il componente di feedback per l'aggiornamento è globale */}
                 <StatusFeedback 
                     {...updateStatus}
                     onConfirm={applyUpdate}
