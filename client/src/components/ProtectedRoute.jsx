@@ -6,18 +6,23 @@ const ProtectedRoute = ({ children }) => {
     const { user, loading } = useUser();
     const token = localStorage.getItem('token');
 
-    // Se stiamo ancora verificando (loading è true), fermati qui!
-    if (loading) {
-        return <div style={{ textAlign: 'center', marginTop: '50px' }}>Riconnessione...</div>;
+    // Se c'è un token, non bloccare l'utente sulla schermata blu!
+    // Lo facciamo entrare, i componenti interni (Dashboard) 
+    // gestiranno il loro caricamento specifico.
+    if (token) {
+        return children;
     }
 
-    // Se il caricamento è FINITO (loading è false) e non abbiamo l'utente 
-    // E non c'è nemmeno un token residuo, allora vai al login.
-    if (!user && !token) {
+    // Se non c'è token e abbiamo finito di caricare, allora login
+    if (!loading && !user && !token) {
         return <Navigate to="/login" replace />;
     }
 
-    // Se abbiamo l'utente o almeno il token, mostriamo i figli (Dashboard)
+    // Schermata di fallback solo se proprio non sappiamo chi è l'utente
+    if (loading && !token) {
+        return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Caricamento...</div>;
+    }
+
     return children;
 };
 
