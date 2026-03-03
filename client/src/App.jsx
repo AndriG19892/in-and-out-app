@@ -15,47 +15,14 @@ function App() {
     return (
         <div style={ {backgroundColor: '#1a3c4a', minHeight: '100vh'} }>
             <UserProvider>
-                <Routes>
+                <Routes><Route path="/" element={ <ProtectedRoute><MainLayout><DashboardPage/></MainLayout></ProtectedRoute> }/>
                     <Route path="/login" element={ <LoginPage/> }/>
                     <Route path="/register" element={ <RegisterPage/> }/>
-                    
-                    <Route path="/dashboard" element={
-                        <ProtectedRoute>
-                            <MainLayout>
-                                <DashboardPage/>
-                            </MainLayout>
-                        </ProtectedRoute>
-                    }/>
-                    
-                    <Route path="/transaction/:type" element={ 
-                        <ProtectedRoute> 
-                            <TransacationPage/> 
-                        </ProtectedRoute> 
-                    }/>
-                    
-                    <Route path="/transactions" element={
-                        <ProtectedRoute>
-                            <TransactionsList />
-                        </ProtectedRoute>
-                    } />
-                    
-                    <Route path="/stats" element={ 
-                        <MainLayout>
-                            <div style={{color: 'white', textAlign: 'center', paddingTop: '50px'}}>
-                                Pagina Stats (Coming Soon)
-                            </div>
-                        </MainLayout> 
-                    }/>
-                    
-                    <Route path="/profile" element={
-                        <ProtectedRoute>
-                            <MainLayout>
-                                <ProfilePage/>
-                            </MainLayout>
-                        </ProtectedRoute>
-                    }/>
-                    
-                    <Route path="*" element={ <Navigate to="/login"/> }/>
+                    <Route path="/dashboard" element={ <ProtectedRoute> <MainLayout><DashboardPage/></MainLayout> </ProtectedRoute> }/>
+                    <Route path="/transaction/:type" element={ <ProtectedRoute><TransacationPage/></ProtectedRoute> }/>
+                    <Route path="/transactions" element={ <ProtectedRoute><TransactionsList/></ProtectedRoute> }/>
+                    <Route path="/stats" element={ <MainLayout><div style={ {color: 'white', textAlign: 'center', paddingTop: '50px'} }>Pagina Stats (Coming Soon)</div></MainLayout> }/>
+                    <Route path="/profile" element={ <ProtectedRoute><MainLayout><ProfilePage/></MainLayout></ProtectedRoute> }/>
                 </Routes>
             </UserProvider>
         </div>
