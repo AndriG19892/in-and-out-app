@@ -21,30 +21,24 @@ export const UserProvider = ({ children }) => {
     };
 
 useEffect(() => {
-    const loadUser = async () => {
-        const token = localStorage.getItem('token');
-        const storedUserId = localStorage.getItem('userId');
-        
-        if (token) {
-            // Se abbiamo un userId salvato, impostiamo un utente "minimo" 
-            // per sbloccare subito l'interfaccia
-            if (storedUserId) {
-                setUser({ id: storedUserId, temp: true });
-            }
+        const loadUser = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return; // Se non c'è token, non fare nulla e non caricare
 
+            setLoading(true); // Carichiamo solo se c'è un token da verificare
             try {
                 const res = await api.get('/auth/me');
                 setUser(res.data.user);
             } catch (err) {
                 console.error("Sessione scaduta");
-                logout();
+                localStorage.clear();
+                setUser(null);
+            } finally {
+                setLoading(false);
             }
-        }
-        // Spostiamo il setLoading(false) fuori o usiamo un finally
-        setLoading(false); 
-    };
-    loadUser();
-}, []);
+        };
+        loadUser();
+    }, []);
 
     const login = (userData) => {
         const id = userData.id || userData._id;
@@ -60,9 +54,9 @@ useEffect(() => {
     };
 
 return (
-    <UserContext.Provider value={{ user, login, logout, loading }}>
-        {/* Rimuoviamo il blocco !loading && children per non "killare" l'app */}
-        {children}
-    </UserContext.Provider>
-);
+        <UserContext.Provider value={{ user, login, logout, loading }}>
+            {/* 2. MAI PIÙ il blocco {!loading && children} */}
+            {children}
+        </UserContext.Provider>
+    );
 };
