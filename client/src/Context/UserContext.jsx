@@ -20,23 +20,31 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    // Effetto al caricamento: controlla se l'utente è già loggato (REFRESH)
-    useEffect(() => {
-        const loadUser = async () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                try {
-                    const res = await api.get('/auth/me'); // Recupera l'utente dal token
-                    setUser(res.data.user);
-                } catch (err) {
-                    console.error("Sessione scaduta");
-                    logout();
-                }
+useEffect(() => {
+    const loadUser = async () => {
+        const token = localStorage.getItem('token');
+        const storedUserId = localStorage.getItem('userId');
+        
+        if (token) {
+            // Se abbiamo un userId salvato, impostiamo un utente "minimo" 
+            // per sbloccare subito l'interfaccia
+            if (storedUserId) {
+                setUser({ id: storedUserId, temp: true });
             }
-            setLoading(false);
-        };
-        loadUser();
-    }, []);
+
+            try {
+                const res = await api.get('/auth/me');
+                setUser(res.data.user);
+            } catch (err) {
+                console.error("Sessione scaduta");
+                logout();
+            }
+        }
+        // Spostiamo il setLoading(false) fuori o usiamo un finally
+        setLoading(false); 
+    };
+    loadUser();
+}, []);
 
     const login = (userData) => {
         const id = userData.id || userData._id;
@@ -51,9 +59,10 @@ export const UserProvider = ({ children }) => {
         window.location.href = "/login";
     };
 
-    return (
-        <UserContext.Provider value={{ user, login, logout, loading }}>
-            {!loading && children}
-        </UserContext.Provider>
-    );
+return (
+    <UserContext.Provider value={{ user, login, logout, loading }}>
+        {/* Rimuoviamo il blocco !loading && children per non "killare" l'app */}
+        {children}
+    </UserContext.Provider>
+);
 };
