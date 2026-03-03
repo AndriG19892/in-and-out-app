@@ -6,6 +6,7 @@ const ProtectedRoute = ({ children }) => {
 const token = localStorage.getItem('token');
 
     // Se non c'è il token nel browser, vai al login istantaneamente
+    console.log("token trovato",token);
     if (!token) {
         return <Navigate to="/login" replace />;
     }
