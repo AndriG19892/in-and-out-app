@@ -1,6 +1,6 @@
 // public/sw.js
 
-const CACHE_NAME = 'in-out-cache-v1.0.9'; // <--- Cambia questo
+const CACHE_NAME = 'in-out-cache-v1.0.10'; // <--- Cambia questo
 
 self.addEventListener('install', (event) => {
   // Forza il Service Worker appena scaricato a diventare attivo subito
