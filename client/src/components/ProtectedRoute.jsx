@@ -3,26 +3,15 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useUser } from '../hooks/useUser.js';
 
 const ProtectedRoute = ({ children }) => {
-    const { user, loading } = useUser();
-    const token = localStorage.getItem('token');
+const token = localStorage.getItem('token');
 
-    // Se c'è un token, non bloccare l'utente sulla schermata blu!
-    // Lo facciamo entrare, i componenti interni (Dashboard) 
-    // gestiranno il loro caricamento specifico.
-    if (token) {
-        return children;
-    }
-
-    // Se non c'è token e abbiamo finito di caricare, allora login
-    if (!loading && !user && !token) {
+    // Se non c'è il token nel browser, vai al login istantaneamente
+    if (!token) {
         return <Navigate to="/login" replace />;
     }
 
-    // Schermata di fallback solo se proprio non sappiamo chi è l'utente
-    if (loading && !token) {
-        return <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>Caricamento...</div>;
-    }
-
+    // Se c'è il token, entra pure. Se poi il token è scaduto, 
+    // ci penserà il logout automatico del Context a buttarti fuori dopo.
     return children;
 };
 
