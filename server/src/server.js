@@ -17,6 +17,13 @@ app.use ( cors ( {
     credentials: true
 } ) );
 app.use ( express.json () );
+
+app.use((req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+    next();
+});
 //definizione degli endpoing
 app.use ( '/api/auth', authRoutes );
 app.use ( '/api/users', userRoutes );
