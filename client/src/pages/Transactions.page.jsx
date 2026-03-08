@@ -117,21 +117,22 @@ const TransactionsPage = () => {
         },
         controlsRow: {
             display: 'flex',
-            gap: '87px', // Ripristinato gap normale per mobile
             marginBottom: '20px',
             width: '100%',
             boxSizing: 'border-box'
         },
         searchWrapper: {
             position: 'relative',
-            flex: 2,
+            display: 'flex',
+            width:'50%',
         },
         dateWrapper: {
             position: 'relative',
             flex: 1.2,
         },
-        input: {
-            width: '100%',
+
+        inputSearch: {
+            width: '80%',
             padding: '14px 14px 14px 44px', // Aumentato spazio a sinistra
             borderRadius: '18px',
             border: '1px solid #f1f5f9', // Un bordo leggerissimo aiuta la definizione
@@ -240,7 +241,7 @@ const TransactionsPage = () => {
                             transform: 'translateY(-50%)'
                         } }/>
                         <input
-                            style={ styles.input }
+                            style={ styles.inputSearch }
                             placeholder="Cerca..."
                             value={ searchTerm }
                             onChange={ ( e ) => setSearchTerm ( e.target.value ) }
