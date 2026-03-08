@@ -119,7 +119,8 @@ const TransactionsPage = () => {
             display: 'flex',
             marginBottom: '20px',
             width: '100%',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            gap:'15px'
         },
         searchWrapper: {
             position: 'relative',
