@@ -76,11 +76,9 @@ const TransactionsPage = () => {
         setStatus ( {loading: true, msg: "Eliminazione in corso...", type: ""} );
         try {
             await api.delete ( `/transactions/${ transactionToDelete }` );
-
             const updatedList = allTransactions.filter ( t => t._id !== transactionToDelete );
             setAllTransactions ( updatedList );
             setFilteredTransactions ( updatedList );
-
             setStatus ( {loading: false, msg: "Movimento eliminato con successo!", type: "success"} );
             setTransactionToDelete ( null );
 
