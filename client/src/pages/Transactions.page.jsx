@@ -152,7 +152,7 @@ const TransactionsPage = () => {
             boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
+            justifyContent: 'start',
             gap: '8px',
             color: '#94a3b8', // Colore icona e testo placeholder
             fontSize: '0.85rem',
