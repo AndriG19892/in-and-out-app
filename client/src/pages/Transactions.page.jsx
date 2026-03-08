@@ -3,6 +3,7 @@ import api from "../api/axiosConfig.js";
 import {useUser} from "../hooks/useUser.js";
 import {Search, Calendar, ArrowDown, ArrowUp, ChevronLeft, X, Trash2} from 'lucide-react';
 import {useNavigate} from "react-router-dom";
+import MonthPicker from "../components/MonthPicker.jsx"
 import BottomNav from "../components/BottomNav.jsx";
 import StatusFeedback from "../components/StatusFeedback.jsx"; // Assicurati che il percorso sia corretto
 
@@ -14,6 +15,7 @@ const TransactionsPage = () => {
     const [searchTerm, setSearchTerm] = useState ( "" );
     const [filterCategory, setFilterCategory] = useState ( "Tutte" );
     const [filterDate, setFilterDate] = useState ( "" );
+    const [showMonthPicker, setShowMonthPicker] = useState ( false );
 
     // Stati per il feedback e la gestione eliminazione
     const [status, setStatus] = useState ( {loading: false, msg: "", type: ""} );
@@ -46,13 +48,13 @@ const TransactionsPage = () => {
             result = result.filter ( t => t.category === filterCategory );
         }
         if ( filterDate ) {
+            // filterDate ora sarà in formato "YYYY-MM"
             result = result.filter ( t => {
                 const d = new Date ( t.date );
                 const year = d.getFullYear ();
                 const month = String ( d.getMonth () + 1 ).padStart ( 2, '0' );
-                const day = String ( d.getDate () ).padStart ( 2, '0' );
-                const tDateString = `${ year }-${ month }-${ day }`;
-                return tDateString === filterDate;
+                const tMonthString = `${ year }-${ month }`; // Formato YYYY-MM
+                return tMonthString === filterDate;
             } );
         }
         setFilteredTransactions ( result );
@@ -247,30 +249,25 @@ const TransactionsPage = () => {
                         />
                     </div>
 
-                    <div className="searchControll" style={ styles.dateWrapper }>
-                        {/* Il Bottone Estetico */ }
+                    <div style={ styles.dateWrapper } onClick={ () => setShowMonthPicker ( true ) }>
                         <div style={ styles.dateButton }>
                             <Calendar size={ 18 } color={ filterDate ? "#4ade80" : "#94a3b8" }/>
-                            <span style={ {color: filterDate ? "#1e3a3a" : "#94a3b8"} }>
-            { filterDate ? new Date ( filterDate ).toLocaleDateString ( 'it-IT' ) : "Data" }
-        </span>
+                            <span style={ {color: filterDate ? "#1e3a3a" : "#94a3b8", textTransform: 'capitalize'} }>
+                                { filterDate ? new Date ( filterDate + "-01" ).toLocaleDateString ( 'it-IT', {month: 'long', year: 'numeric'} ) : "Mese" }
+                            </span>
                         </div>
-
-                        {/* L'input invisibile che gestisce la logica */ }
-                        <input
-                            type="date"
-                            style={ styles.dateInputHidden }
-                            value={ filterDate }
-                            onChange={ ( e ) => setFilterDate ( e.target.value ) }
-                        />
                         { filterDate && (
                             <X size={ 14 } color="#ef4444" style={ {
                                 position: 'absolute',
                                 right: '8px',
                                 top: '50%',
                                 transform: 'translateY(-50%)',
-                                cursor: 'pointer'
-                            } } onClick={ () => setFilterDate ( "" ) }/>
+                                zIndex: 5
+                            } }
+                               onClick={ ( e ) => {
+                                   e.stopPropagation ();
+                                   setFilterDate ( "" );
+                               } }/>
                         ) }
                     </div>
                 </div>
@@ -345,6 +342,16 @@ const TransactionsPage = () => {
                     setTransactionToDelete ( null );
                 } }
             />
+            { showMonthPicker && (
+                <MonthPicker
+                    currentFilter={ filterDate }
+                    onSelect={ ( val ) => {
+                        setFilterDate ( val );
+                        setShowMonthPicker ( false );
+                    } }
+                    onClose={ () => setShowMonthPicker ( false ) }
+                />
+            ) }
             <BottomNav/>
         </div>
     );
