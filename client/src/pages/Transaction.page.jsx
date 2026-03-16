@@ -133,7 +133,12 @@ const TransactionPage = () => {
             outline: 'none',
             color: '#1e3a3a',
             transition: 'all 0.2s ease',
-            fontFamily: 'inherit'
+            fontFamily: 'inherit',
+            width: '100%',            // Forza la larghezza
+            boxSizing: 'border-box',  // Include padding e bordo nel calcolo della larghezza
+            appearance: 'none',       // Rimuove stili nativi che potrebbero bloccare il width
+            WebkitAppearance: 'none', // Specifica per browser basati su Safari/Chrome mobile
+            minHeight: '60px'
         },
         submitBtn: {
             marginTop: '20px',
