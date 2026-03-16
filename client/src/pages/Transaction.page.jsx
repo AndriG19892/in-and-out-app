@@ -14,14 +14,15 @@ const TransactionPage = () => {
     const [formData, setFormData] = useState ( {
         amount: "",
         category: "",
-        description: ""
+        description: "",
+        date: new Date().toISOString().split('T')[0],
     } );
     const [loading, setLoading] = useState ( false );
 
     const handleSubmit = async ( e ) => {
         e.preventDefault ();
         //evita i click multipli
-        if(status.loading ) return;
+        if ( status.loading ) return;
         setStatus ( {loading: true, msg: "", type: ""} );
         try {
             // Prepariamo i dati puliti
@@ -29,6 +30,7 @@ const TransactionPage = () => {
                 amount: Number ( formData.amount ), // Convertiamo in numero reale
                 category: formData.category,
                 description: formData.description || "Nessuna nota", // Evitiamo campi vuoti
+                date: formData.date ? new Date(formData.date).getTime() : Date.now(),
                 type: type,
                 userId: userId
             };
@@ -36,22 +38,22 @@ const TransactionPage = () => {
             const response = await api.post ( "/transactions/add", payload );
 
             if ( response.status === 200 || response.status === 201 ) {
-                setStatus({
+                setStatus ( {
                     loading: false,
                     msg: "Transazione aggiunta con successo!",
                     type: "success",
-                })
+                } )
                 //torno alla dashboard dopo un secondo
                 setTimeout ( () => navigate ( "/dashboard" ), 1500 );
             }
         } catch (error) {
             // Log dettagliato per capire COSA dice il server
             console.error ( "Errore del server:", error.response?.data || error.message );
-            setStatus({
+            setStatus ( {
                 loading: false,
-                msg: err.response?.data.message || "Errore durante l'inserimento della transazione.",
+                msg: error.response?.data.message || "Errore durante l'inserimento della transazione.",
                 type: "error",
-            })
+            } )
         } finally {
             setLoading ( false );
         }
@@ -170,6 +172,18 @@ const TransactionPage = () => {
             </div>
 
             <form style={ styles.form } onSubmit={ handleSubmit }>
+                {/* Date */ }
+                <div style={ styles.inputWrapper }>
+                    <div style={ styles.labelRow }>
+                        <span>{ isIn ? "Data Entrata" : "Data Uscita" }</span>
+                    </div>
+                    <input
+                        type="date"
+                        style={ styles.inputField }
+                        value={ formData.date }
+                        onChange={ ( e ) => setFormData ( {...formData, date: e.target.value} ) }
+                    />
+                </div>
                 {/* Importo */ }
                 <div style={ styles.inputWrapper }>
                     <div style={ styles.labelRow }>
